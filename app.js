@@ -5,7 +5,6 @@
 
 var express = require('express');
 var routes = require('./routes');
-var user = require('./routes/user');
 var login = require('./routes/login');
 var http = require('http');
 var path = require('path');
@@ -41,7 +40,7 @@ var requireAuthentication = function(req, res, next) {
     }
     else
     {
-        res.redirect('/login');
+        res.redirect('/sessions/new');
     }
 }
 
@@ -50,11 +49,15 @@ var loadUser = function(req, res, next) {
     next();
 }
 
-app.get('/login', login.loginPage);
-app.post('/login', login.loginAction);
+app.get('/sessions/new', login.loginPage);
+app.post('/sessions/create', login.loginAction);
 
+
+//All pages past this point require authentication
 app.all('*', requireAuthentication);
-app.get('/', routes.index);
+
+app.get('/feed', routes.index);
+app.get('/', function(req, res) { res.redirect('/feed'); });
 
 // initialize server
 http.createServer(app).listen(app.get('port'), function(){

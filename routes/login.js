@@ -8,5 +8,5 @@ exports.loginPage = function(req, res){
 
 exports.loginAction = function(req, res){
     req.session.username = req.body.username;
-    res.redirect('/');
+    res.redirect('/feed');
 }
