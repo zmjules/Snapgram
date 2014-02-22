@@ -55,7 +55,6 @@ app.post('/login', login.loginAction);
 
 app.all('*', requireAuthentication);
 app.get('/', routes.index);
-app.get('/users', user.list);
 
 // initialize server
 http.createServer(app).listen(app.get('port'), function(){
