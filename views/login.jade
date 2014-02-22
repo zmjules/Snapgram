@@ -1,0 +1,14 @@
+extends layout
+
+block content
+  h1 Log In
+  form(method='post', action='/login')
+
+    p
+        label User 
+        input(type='text',name='username')
+    p
+        label Password 
+        input(type='password', name='password')
+    p
+        input(type='submit', name='submit')

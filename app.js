@@ -6,6 +6,7 @@
 var express = require('express');
 var routes = require('./routes');
 var user = require('./routes/user');
+var login = require('./routes/login');
 var http = require('http');
 var path = require('path');
 
@@ -20,8 +21,10 @@ app.use(express.logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded());
 app.use(express.methodOverride());
-app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.cookieParser());
+app.use(express.cookieSession({'key': 'sid', 'secret': 'someSecret'}));
+app.use(app.router);
 
 // development only
 if ('development' == app.get('env')) {
@@ -31,6 +34,26 @@ if ('development' == app.get('env')) {
 // KODY ADDS A COMMENT HERE!!
 // JULIA ADDS TO THE COMMENT.
 
+var requireAuthentication = function(req, res, next) {
+    if (req.session.username)
+    {
+        next();
+    }
+    else
+    {
+        res.redirect('/login');
+    }
+}
+
+var loadUser = function(req, res, next) {
+    console.log("Test2");
+    next();
+}
+
+app.get('/login', login.loginPage);
+app.post('/login', login.loginAction);
+
+app.all('*', requireAuthentication);
 app.get('/', routes.index);
 app.get('/users', user.list);
 
