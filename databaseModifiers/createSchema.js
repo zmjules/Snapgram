@@ -1,5 +1,5 @@
 userTable = "CREATE TABLE User (\
-                     `name` VARCHAR(50) NOT NULL PRIMARY KEY,\
+                     `username` VARCHAR(50) NOT NULL PRIMARY KEY,\
                      `password` VARCHAR(50)\
                      );"
 
