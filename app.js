@@ -51,6 +51,8 @@ var loadUser = function(req, res, next) {
 
 app.get('/sessions/new', login.loginPage);
 app.post('/sessions/create', login.loginAction);
+app.get('/users/new', login.registerPage);
+app.post('/users/create', login.registerAction);
 
 
 //All pages past this point require authentication

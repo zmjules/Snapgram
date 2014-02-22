@@ -1,12 +1,9 @@
 extends layout
 
 block content
-  h1 Log In
-  p
-  |   Don't have an account? 
-  a(href="/users/new") Click here
-  |   to register
-  form(method='post', action='/sessions/create')
+  h1 Register
+  form(method='post', action='/users/create')
+
     p
         label Username
         input(type='text',name='username')
