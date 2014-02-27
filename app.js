@@ -44,11 +44,6 @@ var requireAuthentication = function(req, res, next) {
     }
 }
 
-var loadUser = function(req, res, next) {
-    console.log("Test2");
-    next();
-}
-
 app.get('/sessions/new', login.loginPage);
 app.post('/sessions/create', login.loginAction);
 app.get('/users/new', login.registerPage);
