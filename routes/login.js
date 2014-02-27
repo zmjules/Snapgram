@@ -61,3 +61,8 @@ exports.loginAction = function(req, res){
                }
                });
 }
+
+exports.logoutAction = function(req, res){
+    req.session = null;
+    res.redirect("/sessions/new");
+}

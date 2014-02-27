@@ -58,6 +58,7 @@ app.post('/users/create', login.registerAction);
 //All pages past this point require authentication
 app.all('*', requireAuthentication);
 
+app.get('/sessions/end', login.logoutAction);
 app.get('/feed', routes.index);
 app.get('/', function(req, res) { res.redirect('/feed'); });
 
