@@ -34,7 +34,7 @@ if ('development' == app.get('env')) {
 // JULIA ADDS TO THE COMMENT.
 
 var requireAuthentication = function(req, res, next) {
-    if (req.session.username)
+    if (req.session.user)
     {
         next();
     }

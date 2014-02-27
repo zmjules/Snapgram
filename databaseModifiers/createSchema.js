@@ -1,6 +1,10 @@
 userTable = "CREATE TABLE User (\
-                     `username` VARCHAR(50) NOT NULL PRIMARY KEY,\
-                     `password` VARCHAR(50)\
+                     `ID` INT NOT NULL AUTO_INCREMENT,\
+                     `Username` VARCHAR(50) UNIQUE,\
+                     `Password` VARCHAR(50),\
+                     `FirstName` VARCHAR(50),\
+                     `LastName` VARCHAR(50),\
+                     PRIMARY KEY (ID)\
                      );"
 
 

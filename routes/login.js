@@ -16,9 +16,9 @@ exports.registerAction = function(req, res){
     });
     conn.connect();
     
-    registerUser = "INSERT INTO User (username, password) VALUES (?, ?)"
+    registerUser = "INSERT INTO User (Username, Password, FirstName, LastName) VALUES (?, ?, ?, ?)"
     
-    conn.query(registerUser, [req.body.username, req.body.password], function(err, rows, fields) {
+    conn.query(registerUser, [req.body.username, req.body.password, req.body.firstName, req.body.lastName], function(err, rows, fields) {
                if (err) 
                {
                 console.log(err); 
@@ -26,8 +26,8 @@ exports.registerAction = function(req, res){
                }
                else
                {
-                req.session.username = req.body.username;
-                res.redirect('/feed');
+                req.session.user = rows[0];
+                exports.loginAction(req, res);
                }
                });
 }
@@ -46,17 +46,17 @@ exports.loginAction = function(req, res){
                                   });
     conn.connect();
     
-    findUser = "SELECT password from User where username = ?"
+    findUser = "SELECT * from User where Username = ?"
     
     conn.query(findUser, [req.body.username], function(err, rows, fields) {
-               if (err || rows.length < 1 || rows[0].password != req.body.password) 
+               if (err || rows.length != 1 || rows[0].Password != req.body.password)
                {
                console.log("Failed"); 
                res.redirect("/sessions/new");
                }
                else
                {
-               req.session.username = req.body.username;
+               req.session.user = rows[0];
                res.redirect('/feed');
                }
                });
