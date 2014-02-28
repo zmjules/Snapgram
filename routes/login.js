@@ -2,13 +2,18 @@
  * GET login page.
  */
 
-exports.registerPage = function(req, res){
-    res.render('register', { title: 'Register' });
+exports.registerPage = function(req, res, errorMessage){
+    res.render('register', { title: 'Register', error: errorMessage });
 }
 
 exports.registerAction = function(req, res){
     var crypto = require('crypto');
     password = crypto.createHash('sha256').update(req.body.password).digest('hex');
+    if ( !req.body.firstName || !req.body.lastName || !req.body.username || !req.body.password )
+    {
+        error = "Please fill in all fields";
+        exports.registerPage(req, res, error);
+    }
     req.models.User.create([
     {
         FirstName: req.body.firstName,
@@ -19,8 +24,8 @@ exports.registerAction = function(req, res){
     ], function (err, items) {
         if (err) 
         {
-            console.log(err); 
-            res.redirect("/users/new");
+            error = err.message;
+            exports.registerPage(req, res, error);
         }
         else
         {
@@ -30,8 +35,8 @@ exports.registerAction = function(req, res){
     });
 }
 
-exports.loginPage = function(req, res){
-  res.render('login', { title: 'Login' });
+exports.loginPage = function(req, res, errorMessage){
+    res.render('login', { title: 'Login', error: errorMessage });
 };
 
 exports.loginAction = function(req, res){
@@ -40,8 +45,15 @@ exports.loginAction = function(req, res){
     req.models.User.find({Username: req.body.username}, function(err, rows) {
        if (err || rows.length != 1 || rows[0].Password != password)
        {
-           console.log("Failed"); 
-           res.redirect("/sessions/new");
+           if (rows.length == 0)
+              error = "User does not exist";
+           else if (rows.length > 1)
+              error = "Multiple users found with this username (corrupted database)";
+           else if (rows[0].Password != password)
+              error = "Incorrect password";
+           else
+              error = err.message;
+           exports.loginPage(req, res, error);
        }
        else
        {

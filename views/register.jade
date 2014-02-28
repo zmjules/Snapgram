@@ -1,6 +1,8 @@
 extends layout
 
 block content
+  if typeof error == 'string'
+    h3#ErrorMessage Error: #{error}
   h1 Register
   form(method='post', action='/users/create')
 
