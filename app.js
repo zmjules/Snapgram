@@ -4,6 +4,7 @@
  */
 
 var express = require('express');
+var orm = require('orm');
 var routes = require('./routes');
 var login = require('./routes/login');
 var http = require('http');
@@ -11,6 +12,20 @@ var path = require('path');
 
 var app = express();
 
+app.use(orm.express("mysql://s513_b.rougeau:10013253@localhost/s513_b.rougeau", {
+  define: function (db, models, next) {
+      models.User = db.define("User", { 
+          FirstName: String,
+          LastName : String,
+          Username : String,
+          Password : String
+      });
+      next();
+  }
+}));
+
+                  
+                  
 // all environments
 app.set('port', process.env.PORT || 3000);
 app.set('views', path.join(__dirname, 'views'));
