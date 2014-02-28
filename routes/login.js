@@ -7,13 +7,14 @@ exports.registerPage = function(req, res){
 }
 
 exports.registerAction = function(req, res){
-    
+    var crypto = require('crypto');
+    password = crypto.createHash('sha256').update(req.body.password).digest('hex');
     req.models.User.create([
     {
         FirstName: req.body.firstName,
         LastName: req.body.lastName,
         Username: req.body.username,
-        Password: req.body.password,
+        Password: password,
     }
     ], function (err, items) {
         if (err) 
@@ -34,8 +35,10 @@ exports.loginPage = function(req, res){
 };
 
 exports.loginAction = function(req, res){
+    var crypto = require('crypto');
+    password = crypto.createHash('sha256').update(req.body.password).digest('hex');
     req.models.User.find({Username: req.body.username}, function(err, rows) {
-       if (err || rows.length != 1 || rows[0].Password != req.body.password)
+       if (err || rows.length != 1 || rows[0].Password != password)
        {
            console.log("Failed"); 
            res.redirect("/sessions/new");

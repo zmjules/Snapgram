@@ -1,7 +1,7 @@
 userTable = "CREATE TABLE User (\
                      `ID` INT NOT NULL AUTO_INCREMENT,\
                      `Username` VARCHAR(50) UNIQUE,\
-                     `Password` VARCHAR(50),\
+                     `Password` VARCHAR(300),\
                      `FirstName` VARCHAR(50),\
                      `LastName` VARCHAR(50),\
                      PRIMARY KEY (ID)\
