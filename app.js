@@ -14,13 +14,37 @@ var app = express();
 
 app.use(orm.express("mysql://s513_b.rougeau:10013253@localhost/s513_b.rougeau", {
   define: function (db, models, next) {
-      models.User = db.define("User", { 
-          FirstName: String,
-          LastName : String,
-          Username : String,
-          Password : String
-      });
-      next();
+    models.User = db.define("User", { 
+        FirstName: String,
+        LastName : String,
+        Username : String,
+        Password : String
+    });
+    models.Photo = db.define("Photo", { 
+        Path: String,
+        Timestamp : Date
+    });
+    models.Follow = db.define("Follow", {
+        //No fields, both fields are relationships defined below
+    });
+    models.Feed = db.define("Feed", { 
+        Feed: String
+    }, {
+        methods: {
+            addToFeed: function (photoID) {
+                this.Feed = JSON.stringify(JSON.parse(this.Feed) + photoID);
+                this.save();
+            },
+            getFeed: function () {
+                return JSON.parse(this.Feed);
+            }
+    }
+    });
+    models.Photo.hasOne("Owner", models.User);
+    models.Follow.hasOne("Follower", models.User);
+    models.Follow.hasOne("Followee", models.User);
+    models.Feed.hasOne("UserID", models.User);
+    next();
   }
 }));
 
