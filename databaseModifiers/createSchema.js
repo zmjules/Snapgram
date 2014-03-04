@@ -61,7 +61,7 @@ conn.query(userTable, function(err, rows, fields) {
 conn.query(photoTable, function(err, rows, fields) {
            if (err) throw err;
            
-           console.log('Created follow table');
+           console.log('Created photo table');
            });
 
 conn.query(followTable, function(err, rows, fields) {
@@ -73,7 +73,7 @@ conn.query(followTable, function(err, rows, fields) {
 conn.query(feedTable, function(err, rows, fields) {
            if (err) throw err;
            
-           console.log('Created follow table');
+           console.log('Created feed table');
            });
 
 conn.end();
