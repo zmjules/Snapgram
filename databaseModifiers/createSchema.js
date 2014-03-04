@@ -23,7 +23,7 @@ followTable = "CREATE TABLE Follow (\
                 `ID` INT NOT NULL AUTO_INCREMENT,\
                 `Follower` INT,\
                 `Followee` INT,\
-                PRIMARY KEY (FollowID),\
+                PRIMARY KEY (ID),\
                 FOREIGN KEY (Follower) REFERENCES User(ID),\
                 FOREIGN KEY (Followee) REFERENCES User(ID)\
                 );"
