@@ -69,9 +69,6 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
-// KODY ADDS A COMMENT HERE!!
-// JULIA ADDS TO THE COMMENT.
-
 var requireAuthentication = function(req, res, next) {
     if (req.session.user)
     {

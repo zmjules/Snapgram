@@ -1,0 +1,11 @@
+extends layout
+
+block content
+  h1 Upload Photos
+  form(method='post', action='/photos/create')
+    p
+        label Image: 
+        input(type='file',name='image')
+    p
+        input(type='submit', name='submit' value='Submit')
+
