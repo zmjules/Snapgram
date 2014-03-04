@@ -1,6 +1,10 @@
-/*
+  /*
  * GET login page.
  */
+
+exports.uploadPage = function(req, res, errorMessage){
+    res.render('upload', {});
+}
 
 exports.registerPage = function(req, res, errorMessage){
     res.render('register', { title: 'Register', error: errorMessage });
