@@ -93,6 +93,7 @@ app.get('/sessions/end', login.logoutAction);
 app.get('/feed', routes.index);
 app.get('/users/:id', routes.stream);
 app.get('/photos/new', login.uploadPage);
+app.post('/photos/create', login.uploadAction);
 app.get('/', function(req, res) { res.redirect('/feed'); });
 
 // initialize server

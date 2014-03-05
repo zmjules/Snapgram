@@ -3,7 +3,22 @@
  */
 
 exports.uploadPage = function(req, res, errorMessage){
-    res.render('upload', {user: req.session.user});
+    res.render('upload', {user: req.session.user, error: errorMessage });
+}
+
+exports.uploadAction = function(req, res, errorMessage){
+
+  // return to upload page if no image provided
+  if ( !req.body.image ){
+      error = "302 Found. Photo not found.";
+      exports.uploadPage(req, res, error);    
+  }
+  else {
+  //TODO: file provided
+
+  }
+
+
 }
 
 exports.registerPage = function(req, res, errorMessage){
