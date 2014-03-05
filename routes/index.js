@@ -4,7 +4,7 @@
  */
 
 exports.index = function(req, res){
-    res.render('index', { title: 'Feed', user: req.session.user });
+    res.render('index', { authenticated: true, title: 'Feed', user: req.session.user });
 };
 
 // TODO: Create stream.jade
@@ -30,7 +30,7 @@ exports.stream = function(req, res){
        else
        {
             user = rows[0]
-    
+
             req.models.Follow.find({follower_id: req.session.user.id, followee_id: id}, function(err, rows) {
                 if (err)
                 {
@@ -49,7 +49,7 @@ exports.stream = function(req, res){
 
                 console.log('ID: ' + req.params.id);
 
-                res.render('stream', { title: 'Stream', id: id, user: user, following: following});
+			    res.render('stream', { authenticated: true, title: 'Stream', id: id, user: user, following: following});
                                    
            });
          }

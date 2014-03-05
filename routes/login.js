@@ -7,7 +7,7 @@ var path = require('path');
 var fs = require('fs');
 
 exports.uploadPage = function(req, res, errorMessage){
-    res.render('upload', {user: req.session.user, error: errorMessage });
+    res.render('upload', {authenticated: true, error: errorMessage });
 }
 
 exports.uploadAction = function(req, res, errorMessage){
@@ -41,7 +41,7 @@ exports.uploadAction = function(req, res, errorMessage){
 }
 
 exports.registerPage = function(req, res, errorMessage){
-    res.render('register', { title: 'Register', error: errorMessage });
+    res.render('register', { authenticated: (req.session.user !== null), title: 'Register', error: errorMessage });
 }
 
 exports.registerAction = function(req, res){
@@ -74,7 +74,7 @@ exports.registerAction = function(req, res){
 }
 
 exports.loginPage = function(req, res, errorMessage){
-    res.render('login', { title: 'Login', error: errorMessage });
+    res.render('login', {authenticated: (req.session.user !== null), title: 'Login', error: errorMessage });
 };
 
 exports.loginAction = function(req, res){

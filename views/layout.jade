@@ -6,6 +6,6 @@ html
 	body
 		.header
 			img(src='/images/snapgramLogo.png')
-			if user
+			if authenticated
 				a.logout(href="/sessions/end") Logout
 		block content
