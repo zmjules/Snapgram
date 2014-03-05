@@ -1,6 +1,7 @@
   /*
  * GET login page.
  */
+var path = require('path');
 
 exports.uploadPage = function(req, res, errorMessage){
     res.render('upload', {user: req.session.user, error: errorMessage });
@@ -10,15 +11,24 @@ exports.uploadAction = function(req, res, errorMessage){
 
   // return to upload page if no image provided
   if ( !req.body.image ){
-      error = "302 Found. Photo not found.";
+      error = "302 Found. File Not Found.";
       exports.uploadPage(req, res, error);    
   }
   else {
-  //TODO: file provided
+    var extension = path.extname(req.body.image)
+    console.log(extension);
+    
+    // error if an image was not provided
+    if (extension != 'jpg' && extension != 'gif' && extension != 'png' && extension != 'tif'){
+      error = "302 Found. File Not An Image.";
+      exports.uploadPage(req, res, error);   
+    }
+    // valid image provided 
+    else{
+
+    }
 
   }
-
-
 }
 
 exports.registerPage = function(req, res, errorMessage){
