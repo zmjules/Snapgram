@@ -2,6 +2,9 @@
  * GET login page.
  */
 var path = require('path');
+var imagemagick = require('imagemagick');
+var gm = require('gm').subClass({ imageMagick: true });
+var fs = require('fs');
 
 exports.uploadPage = function(req, res, errorMessage){
     res.render('upload', {user: req.session.user, error: errorMessage });
@@ -15,7 +18,7 @@ exports.uploadAction = function(req, res, errorMessage){
       exports.uploadPage(req, res, error);    
   }
   else {
-    var extension = path.extname(req.body.image)
+    var extension = path.extname(req.body.image).substring(1);
     console.log(extension);
     
     // error if an image was not provided
@@ -24,10 +27,16 @@ exports.uploadAction = function(req, res, errorMessage){
       exports.uploadPage(req, res, error);   
     }
     // valid image provided 
-    else{
+    else {
+      //TODO: FIXME
+      fs.readFile(req.body.image, function (err, data) {
+        var newPath = "/photos/test";
+        fs.writeFile(newPath, data, function (err) {
+          res.redirect("back");
+        });
+      });
 
-    }
-
+    } 
   }
 }
 
