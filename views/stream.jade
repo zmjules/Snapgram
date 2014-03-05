@@ -3,6 +3,12 @@ extends layout
 block content
 
 	h1.title #{user.FirstName} #{user.LastName}'s Stream
+	if following
+		a(href='/users/' + user.id + '/unfollow')
+			h3 Unfollow
+	else
+		a(href='/users/'+user.id+'/follow')
+			h3 Follow
 	.imageSpace
 		//all of this is for testing layout
 		.thumbContainer
