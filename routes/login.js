@@ -2,8 +2,8 @@
  * GET login page.
  */
 var path = require('path');
-var imagemagick = require('imagemagick');
-var gm = require('gm').subClass({ imageMagick: true });
+//var imagemagick = require('imagemagick');
+//var gm = require('gm').subClass({ imageMagick: true });
 var fs = require('fs');
 
 exports.uploadPage = function(req, res, errorMessage){
