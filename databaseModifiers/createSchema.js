@@ -12,27 +12,27 @@ userTable = "CREATE TABLE User (\
 photoTable = "CREATE TABLE Photo (\
                 `ID` INT NOT NULL AUTO_INCREMENT,\
                 `Path` VARCHAR(300),\
-                `Owner` INT,\
+                `owner_id` INT,\
                 `Timestamp` INT,\
                 PRIMARY KEY (ID),\
-                FOREIGN KEY (OWNER) REFERENCES User(ID)\
+                FOREIGN KEY (Owner_id) REFERENCES User(ID)\
                 );"
 
 
 followTable = "CREATE TABLE Follow (\
                 `ID` INT NOT NULL AUTO_INCREMENT,\
-                `Follower` INT,\
-                `Followee` INT,\
+                `follower_id` INT,\
+                `followee_id` INT,\
                 PRIMARY KEY (ID),\
-                FOREIGN KEY (Follower) REFERENCES User(ID),\
-                FOREIGN KEY (Followee) REFERENCES User(ID)\
+                FOREIGN KEY (Follower_id) REFERENCES User(ID),\
+                FOREIGN KEY (Followee_id) REFERENCES User(ID)\
                 );"
 
 feedTable = "CREATE TABLE Feed (\
-                `UserID` INT NOT NULL AUTO_INCREMENT,\
+                `user_id` INT NOT NULL AUTO_INCREMENT,\
                 `FeedList` VARCHAR(1000),\
-                PRIMARY KEY (UserID),\
-                FOREIGN KEY (UserID) REFERENCES User(ID)\
+                PRIMARY KEY (User_id),\
+                FOREIGN KEY (User_id) REFERENCES User(ID)\
             );"
 
 

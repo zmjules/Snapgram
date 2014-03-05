@@ -28,7 +28,7 @@ app.use(orm.express("mysql://s513_b.rougeau:10013253@localhost/s513_b.rougeau", 
         //No fields, both fields are relationships defined below
     });
     models.Feed = db.define("Feed", { 
-        Feed: String
+        FeedList: String
     }, {
         methods: {
             addToFeed: function (photoID) {
@@ -40,10 +40,10 @@ app.use(orm.express("mysql://s513_b.rougeau:10013253@localhost/s513_b.rougeau", 
             }
     }
     });
-    models.Photo.hasOne("Owner", models.User);
-    models.Follow.hasOne("Follower", models.User);
-    models.Follow.hasOne("Followee", models.User);
-    models.Feed.hasOne("UserID", models.User);
+    models.Photo.hasOne("owner", models.User);
+    models.Follow.hasOne("follower", models.User);
+    models.Follow.hasOne("followee", models.User);
+    models.Feed.hasOne("user", models.User);
     next();
   }
 }));
@@ -92,6 +92,8 @@ app.all('*', requireAuthentication);
 app.get('/sessions/end', login.logoutAction);
 app.get('/feed', routes.index);
 app.get('/users/:id', routes.stream);
+app.get('/users/:id/follow', routes.follow);
+app.get('/users/:id/unfollow', routes.unfollow);
 app.get('/photos/new', login.uploadPage);
 app.post('/photos/create', login.uploadAction);
 app.get('/', function(req, res) { res.redirect('/feed'); });
