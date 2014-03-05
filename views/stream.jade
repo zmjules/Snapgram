@@ -2,21 +2,22 @@ extends layout
 
 block content
 
-	h1.title #{user.FirstName} #{user.LastName}'s Stream
+	h1.title #{user.FirstName} #{user.LastName}'s Stream 
 	if following
-		a(href='/users/' + user.id + '/unfollow')
-			h3 Unfollow
+		a.follow(href='/users/' + user.id + '/unfollow') Unfollow
 	else
-		a(href='/users/'+user.id+'/follow')
-			h3 Follow
+		a.follow(href='/users/'+user.id+'/follow') Follow
 	.imageSpace
 		//all of this is for testing layout
 		.thumbContainer
 			a(href='/testImages/1.jpg') 
 				img(src='/testImages/1.jpg' width = 400)
-			a.nameLabel(href='/feed/')
-				p Kody Dillman
-			p.timeLabel 2 mins ago
+			br
+			.labelContainer
+				a.share(href='/feed/') share
+				br
+				a.nameLabel(href='/feed/') Kody Dillman
+				p.timeLabel 2 mins ago
 		.thumbContainer
 			img(src='/testImages/2.jpg' width=400)
 			p.nameLabel Kody Dillman
@@ -41,6 +42,5 @@ block content
 			p.timeLabel 2 mins ago
 		br
 	//TODO: Add proper link.
-	a.more(href="/feed/") More 
-	br
-	p  +
+	a.more(href="/feed/") 
+		p More 

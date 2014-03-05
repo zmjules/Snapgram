@@ -1,8 +1,10 @@
 body {
-  padding: 0px;
-  margin: 0px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
-  background-color: rgb(23, 127, 179);
+	position: relative;
+	padding: 0px;
+	margin: 0px;
+	font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+	background-color: rgb(23, 127, 179);
+	margin-bottom: 10px;
 }
 
 h1.title {
@@ -11,47 +13,91 @@ h1.title {
 }
 
 p.timeLabel {
-  font-size: 12px;
-  color: gray;
-  margin-top: 0px;
-  margin-bottom: 0px;
+  	font-size: 12px;
+  	color: gray;
+  	margin-top: 0px;
+  	margin-bottom: 0px;
+}
+
+a.currentUser:link, a.currentUser:visited, a.currentUser:hover, a.currentUser:active {
+	text-decoration:none;
+	color: white;
+	position: absolute;
+	display: block;
+	left: auto;
+	right: 0px;
+	top: 0px;
+	margin-top: 5px;
+	margin-right: 10px;
 }
 
 a.nameLabel:link, a.nameLabel:visited, a.nameLabel:hover, a.nameLabel:active {
-	margin-bottom: 0px;
 	text-decoration:none;
 	color: black;
 }
 
-a.more{
-	position: absolute;
-	right: 0px;
+a.follow:link, a.follow:visited, a.follow:hover, a.follow:active {
+	margin-bottom: 0px;
+	text-decoration:none;
+	color: white;
+	padding: 3px;
+	margin-left: 10px;
+	margin-bottom: 10px;
 
-	padding: 5px;
-	margin: 10px;
+	background-color: rgb(83, 185, 233);
+}
+
+a.share:link, a.share:visited, a.share:hover, a.share:active {
+	text-decoration:none;
+	color: white;
+	padding: 3px;
+	float: right;
+	margin-top: 20px;
+	display: inline-block;
+
+	background-color: rgb(83, 185, 233);
+}
+
+a.more{
+	display: block;
+	margin-top: 20px;
 	font-size: 24px;
+	margin-left: auto;
+	margin-right: auto;
+	width: 7%;
+	text-align: center;
 
 	background-color: rgb(83, 185, 233); 
 }
 
 a.logout:link, a.logout:visited, a.logout:hover, a.logout:active {
-  	position:absolute;
-  	right:10px;
-  	top: 80px;
+	display: block;
+	position: absolute;
+	right: 0px;
+	bottom: 0px;
+	left: auto;
+	margin-right: 10px;
+	margin-bottom: 5px;
   	font-size: 20px;
 
   	text-decoration:none;
 	color:#FFFFFF;
 }
 
+
 a.more:link, a.more:visited, a.more:hover, a.more:active {
 	text-decoration:none;
 	color:#FFFFFF;
+	margin-left: auto;
+	margin-right: auto;
 }
 
+
 div.header {
+	position: relative;
 	height: 107px; /* Same as logo image */
 	background-color: rgb(83, 185, 233);
+	margin-top: 15px;
 }
 
 div.imageSpace {
@@ -66,9 +112,23 @@ div.thumbContainer {
 	box-shadow: 3px 3px 6px #888888;
 	display:inline-block;
 	margin-left: 20px;
-	margin-top: 35px;
-	margin-bottom: 35px;
+	margin-top: 15px;
+	margin-bottom: 15px;
 	padding: 5px;
+}
+
+div.labelContainer {
+	padding-top: 3px;
+	margin-top: -20px;
+	border-width: 2px;
+}
+
+div.newDiv {
+	position: relative;
+
+	border-width: 2px;
+	border: solid;
+	border-color: red;
 }
 
 #ErrorMessage {
