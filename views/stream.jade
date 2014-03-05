@@ -1,0 +1,21 @@
+extends layout
+
+block content
+
+	.imageSpace
+		h1= title
+		p Hello #{user.FirstName} #{user.LastName}! Welcome to the #{title}.
+		//all of this is for testing layout
+		.thumbContainer
+			img(src='/testImages/1.jpg' width=400)
+		.thumbContainer
+			img(src='/testImages/2.jpg' width=400)
+		.thumbContainer
+			img(src='/testImages/3.gif' width=400)
+		br
+		.thumbContainer
+			img(src='/testImages/4.jpg' width=400)
+		.thumbContainer
+			img(src='/testImages/5.png' width=400)
+		.thumbContainer
+			img(src='/testImages/6.jpg' width=400)

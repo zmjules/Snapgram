@@ -69,9 +69,6 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
-// KODY ADDS A COMMENT HERE!!
-// JULIA ADDS TO THE COMMENT.
-
 var requireAuthentication = function(req, res, next) {
     if (req.session.user)
     {
@@ -94,6 +91,7 @@ app.all('*', requireAuthentication);
 
 app.get('/sessions/end', login.logoutAction);
 app.get('/feed', routes.index);
+app.get('/users/:id', routes.stream);
 app.get('/', function(req, res) { res.redirect('/feed'); });
 
 // initialize server
