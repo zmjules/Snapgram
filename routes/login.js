@@ -3,7 +3,7 @@
  */
 
 exports.uploadPage = function(req, res, errorMessage){
-    res.render('upload', {});
+    res.render('upload', {user: req.session.user});
 }
 
 exports.registerPage = function(req, res, errorMessage){
