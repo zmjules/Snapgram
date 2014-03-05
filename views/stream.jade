@@ -2,20 +2,39 @@ extends layout
 
 block content
 
+	h1.title #{user.FirstName} #{user.LastName}'s Stream
 	.imageSpace
-		h1= title
-		p Hello #{user.FirstName} #{user.LastName}! Welcome to the #{title}.
 		//all of this is for testing layout
 		.thumbContainer
-			img(src='/testImages/1.jpg' width=400)
+			a(href='/testImages/1.jpg') 
+				img(src='/testImages/1.jpg' width = 400)
+			a.nameLabel(href='/feed/')
+				p Kody Dillman
+			p.timeLabel 2 mins ago
 		.thumbContainer
 			img(src='/testImages/2.jpg' width=400)
-		.thumbContainer
-			img(src='/testImages/3.gif' width=400)
+			p.nameLabel Kody Dillman
+			p.timeLabel 2 mins ago
 		br
 		.thumbContainer
+			img(src='/testImages/3.gif' width=400)
+			p.nameLabel Kody Dillman
+			p.timeLabel 2 mins ago
+		.thumbContainer
 			img(src='/testImages/4.jpg' width=400)
+			p.nameLabel Kody Dillman
+			p.timeLabel 2 mins ago
+		br
 		.thumbContainer
 			img(src='/testImages/5.png' width=400)
+			p.nameLabel Kody Dillman
+			p.timeLabel 2 mins ago
 		.thumbContainer
 			img(src='/testImages/6.jpg' width=400)
+			p.nameLabel Kody Dillman
+			p.timeLabel 2 mins ago
+		br
+	//TODO: Add proper link.
+	a.more(href="/feed/") More 
+	br
+	p  +
