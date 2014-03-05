@@ -13,6 +13,7 @@ exports.stream = function(req, res){
 	// create photo array here
 	var id = req.params.id;
 	var user;
+    var following = false;
 
 	req.models.User.find({ID: id}, function(err, rows) {
        if (err || rows.length != 1)
@@ -28,14 +29,31 @@ exports.stream = function(req, res){
        }
        else
        {
-           req.session.user = rows[0];
-           user = req.session.user;
-       }
-    });
+            user = rows[0]
+    
+            req.models.Follow.find({follower_id: req.session.user.id, followee_id: id}, function(err, rows) {
+                if (err)
+                {
+                    error = err.message;
+                    console.log("Error: " + error);
+                    //TODO: Redirect to 500 page
+                }
+                else if (rows.length == 0)
+                {
+                   following = false;
+                }
+                else
+                {
+                    following = true;
+                }
 
-	console.log('ID: ' + req.params.id);
+                console.log('ID: ' + req.params.id);
 
-	res.render('stream', { title: 'Stream', id: id, user: req.session.user});
+                res.render('stream', { title: 'Stream', id: id, user: user, following: following});
+                                   
+           });
+         }
+     });
 };
 
 exports.follow = function(req, res){
