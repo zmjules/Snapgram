@@ -107,8 +107,9 @@ exports.loginAction = function(req, res){
     req.models.User.find({Username: req.body.username}, function(err, rows) {
        if (err || rows.length != 1 || rows[0].Password != password)
        {
-           if (rows.length == 0)
+           if (rows.length == 0){
               error = "User does not exist";
+           }
            else if (rows.length > 1)
               error = "Multiple users found with this username (corrupted database)";
            else if (rows[0].Password != password)
