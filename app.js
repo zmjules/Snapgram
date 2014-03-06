@@ -25,7 +25,27 @@ app.use(orm.express("mysql://s513_b.rougeau:10013253@localhost/s513_b.rougeau", 
     models.Photo = db.define("Photo", { 
         Path: String,
         Timestamp : Date
-    });
+    }, {
+      hooks: {
+        afterCreate: function (next){
+          models.Follow.find({followee_id: this.owner_id}, function(err, rows) {
+            rows.forEach(function(row){
+              // add photos to all follower's feeds
+              row.getFollower(function (err, follower){
+                follower.getFeed(function (err, feed){
+                  feed.addToFeed(this.id);
+                })
+                this.owner_id.getFeed(function (err, feed){
+                  // add photos to user's own feed
+                  feed.addToFeed(this.id);
+                })
+              })
+            })
+        });
+      }
+    }
+  });
+
     models.Follow = db.define("Follow", {
         //No fields, both fields are relationships defined below
     });
@@ -45,7 +65,9 @@ app.use(orm.express("mysql://s513_b.rougeau:10013253@localhost/s513_b.rougeau", 
     models.Photo.hasOne("owner", models.User);
     models.Follow.hasOne("follower", models.User);
     models.Follow.hasOne("followee", models.User);
-    models.Feed.hasOne("user", models.User);
+    models.Feed.hasOne("user", models.User, {
+      reverse: "feed"
+    });
     next();
   }
 }));

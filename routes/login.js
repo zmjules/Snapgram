@@ -12,7 +12,7 @@ exports.uploadAction = function(req, res, errorMessage){
 
   // return to upload page if no image provided
   if ( !req.files.image ){
-      error = "302 Found. File Not Found.";
+      error = "File Not Found.";
       exports.uploadPage(req, res, error);    
   }
   else {
@@ -20,7 +20,7 @@ exports.uploadAction = function(req, res, errorMessage){
     
     // error if an image was not provided
     if (extension != 'jpg' && extension != 'gif' && extension != 'png' && extension != 'tif'){
-      error = "302 Found. File Not An Image.";
+      error = "File Not An Image.";
       exports.uploadPage(req, res, error);   
     }
     // valid image provided 
