@@ -2,8 +2,6 @@
  * GET login page.
  */
 var path = require('path');
-//var imagemagick = require('imagemagick');
-//var gm = require('gm').subClass({ imageMagick: true });
 var fs = require('fs');
 
 exports.uploadPage = function(req, res, errorMessage){
@@ -13,13 +11,12 @@ exports.uploadPage = function(req, res, errorMessage){
 exports.uploadAction = function(req, res, errorMessage){
 
   // return to upload page if no image provided
-  if ( !req.body.image ){
+  if ( !req.files.image ){
       error = "302 Found. File Not Found.";
       exports.uploadPage(req, res, error);    
   }
   else {
-    var extension = path.extname(req.body.image).substring(1);
-    console.log(extension);
+    var extension = path.extname(req.files.image.originalFilename).substring(1);
     
     // error if an image was not provided
     if (extension != 'jpg' && extension != 'gif' && extension != 'png' && extension != 'tif'){
@@ -28,13 +25,40 @@ exports.uploadAction = function(req, res, errorMessage){
     }
     // valid image provided 
     else {
-      //TODO: FIXME
-      fs.readFile(req.body.image, function (err, data) {
-        var newPath = "/photos/test";
-        fs.writeFile(newPath, data, function (err) {
-          res.redirect("back");
-        });
+      fs.readFile(req.files.image.path, function (err, data) {
+      var newPath = "./test/";
+      fs.writeFile(newPath, data, function (err) {
+        res.redirect("back");
       });
+      });
+
+      // get field values for db
+      var userID = parseInt(req.session.user.id);
+      var timestamp = new Date().getTime();
+
+      /*req.models.Photo.create([
+      {
+        Path: req.body.image,
+        owner_id: userID,
+        Timestamp: timestamp, 
+      }], function (err, items) {
+                            if (err) 
+                            {
+                            error = err.message;
+                            console.log(error);
+                            //TODO: Redirect to 404 page
+                            res.redirect('/feed');
+                            res.end();
+                            }
+                            else
+                            {                        
+                            console.log(items[0]);
+                            res.redirect('/photos/new');
+                            res.end();
+                            }
+                    }) */ 
+
+    //TODO: add 'after create' hook to photo table so that we query the follow table and then add to the feed table 
 
     } 
   }

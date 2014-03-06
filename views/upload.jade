@@ -4,7 +4,7 @@ block content
   if typeof error == 'string'
     h3#ErrorMessage Error: #{error}
   h1 Upload Photos
-  form(method='post', action='/photos/create')
+  form(method='post', action='/photos/create' enctype='multipart/form-data')
     p
         label Image: 
         input(type='file',name='image')

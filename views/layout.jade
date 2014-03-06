@@ -7,7 +7,8 @@ html
 		.header
 			if user
 				a.currentUser(href="/users/1") krdillma
-			img(src='/images/snapgramLogo.png')
+			a(href='/') 
+				img(src='/images/snapgramLogo.png')
 			if authenticated
 				a.logout(href="/sessions/end") Logout
 		block content
