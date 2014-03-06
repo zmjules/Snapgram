@@ -69,20 +69,13 @@ app.use(app.router);
 //from http://www.hacksparrow.com/express-js-custom-error-pages-404-and-500.html
 // Handle 404
   app.use(function(req, res) {
-     res.status(400).render('404.jade', {title: '404: File Not Found'});
+     res.status(404).render('404.jade', {title: '404: File Not Found'});
   });
   
   // Handle 500
   app.use(function(error, req, res, next) {
-     res.send('500: Internal Server Error', 500);
+     res.status(500).render('500.jade', {title: '500: Internal Server Error'});
   });
-
-/*
-// from stack overflow: http://stackoverflow.com/questions/6528876/how-to-redirect-404-errors-to-a-page-in-expressjs
-app.use(function(req,res){
-    res.status(404).render('404.jade');
-});
-*/
 
 // development only
 if ('development' == app.get('env')) {

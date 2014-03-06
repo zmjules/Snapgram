@@ -4,7 +4,9 @@
  */
 
 exports.index = function(req, res){
-    res.render('index', { authenticated: true, title: 'Feed', user: req.session.user });
+  var user = parseInt(req.session.user.id);
+
+  res.render('index', { authenticated: true, title: 'Feed', user: req.session.user });
 };
 
 // TODO: Create stream.jade
