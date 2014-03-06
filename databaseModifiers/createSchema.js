@@ -13,7 +13,7 @@ photoTable = "CREATE TABLE Photo (\
                 `ID` INT NOT NULL AUTO_INCREMENT,\
                 `Path` VARCHAR(300),\
                 `owner_id` INT,\
-                `Timestamp` INT,\
+                `Timestamp` VARCHAR(30),\
                 PRIMARY KEY (ID),\
                 FOREIGN KEY (Owner_id) REFERENCES User(ID)\
                 );"
