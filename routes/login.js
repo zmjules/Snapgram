@@ -41,7 +41,7 @@ exports.uploadAction = function(req, res, errorMessage){
 }
 
 exports.registerPage = function(req, res, errorMessage){
-    res.render('register', { authenticated: (req.session.user !== null), title: 'Register', error: errorMessage });
+    res.render('register', { authenticated: (req.session.user !== null && req.session.user !== undefined), title: 'Register', error: errorMessage });
 }
 
 exports.registerAction = function(req, res){
@@ -74,7 +74,7 @@ exports.registerAction = function(req, res){
 }
 
 exports.loginPage = function(req, res, errorMessage){
-    res.render('login', {authenticated: (req.session.user !== null), title: 'Login', error: errorMessage });
+    res.render('login', {authenticated: (req.session.user !== null && req.session.user !== undefined), title: 'Login', error: errorMessage });
 };
 
 exports.loginAction = function(req, res){
