@@ -11,6 +11,7 @@ var http = require('http');
 var path = require('path');
 
 var app = express();
+app.use(express.bodyParser({keepExtensions: true, uploadDir: './test'}));
 
 app.use(orm.express("mysql://s513_b.rougeau:10013253@localhost/s513_b.rougeau", {
   define: function (db, models, next) {
