@@ -28,7 +28,7 @@ exports.uploadAction = function(req, res, errorMessage){
       fs.readFile(req.files.image.path, function (err, data) {
       var newPath = "./test/";
       fs.writeFile(newPath, data, function (err) {
-        res.redirect("back");
+        //res.redirect("back");
       });
       });
 
@@ -36,9 +36,9 @@ exports.uploadAction = function(req, res, errorMessage){
       var userID = parseInt(req.session.user.id);
       var timestamp = new Date().getTime();
 
-      /*req.models.Photo.create([
+      req.models.Photo.create([
       {
-        Path: req.body.image,
+        Path: req.files.image.path,
         owner_id: userID,
         Timestamp: timestamp, 
       }], function (err, items) {
@@ -56,7 +56,7 @@ exports.uploadAction = function(req, res, errorMessage){
                             res.redirect('/photos/new');
                             res.end();
                             }
-                    }) */ 
+                    }) 
 
     //TODO: add 'after create' hook to photo table so that we query the follow table and then add to the feed table 
 
