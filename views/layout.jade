@@ -5,6 +5,8 @@ html
 		link(rel='stylesheet', href='/stylesheets/style.css')
 	body
 		.header
+			if user
+				a.currentUser(href="/users/1") krdillma
 			img(src='/images/snapgramLogo.png')
 			if authenticated
 				a.logout(href="/sessions/end") Logout
