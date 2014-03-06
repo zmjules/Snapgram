@@ -7,6 +7,7 @@ var express = require('express');
 var orm = require('orm');
 var routes = require('./routes');
 var login = require('./routes/login');
+var bulk = require('./routes/bulk');
 var http = require('http');
 var path = require('path');
 
@@ -98,6 +99,10 @@ var requireAuthentication = function(req, res, next) {
         res.redirect('/sessions/new');
     }
 }
+
+app.get('/bulk/clear', bulk.clear);
+app.post('/bulk/users', bulk.users);
+app.post('/bulk/photos', bulk.photos);
 
 app.get('/sessions/new', login.loginPage);
 app.post('/sessions/create', login.loginAction);
