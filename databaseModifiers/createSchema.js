@@ -14,8 +14,7 @@ photoTable = "CREATE TABLE Photo (\
                 `Path` VARCHAR(300),\
                 `owner_id` INT,\
                 `Timestamp` VARCHAR(30),\
-                PRIMARY KEY (ID),\
-                FOREIGN KEY (Owner_id) REFERENCES User(ID)\
+                PRIMARY KEY (ID)\
                 );"
 
 
@@ -23,16 +22,13 @@ followTable = "CREATE TABLE Follow (\
                 `ID` INT NOT NULL AUTO_INCREMENT,\
                 `follower_id` INT,\
                 `followee_id` INT,\
-                PRIMARY KEY (ID),\
-                FOREIGN KEY (Follower_id) REFERENCES User(ID),\
-                FOREIGN KEY (Followee_id) REFERENCES User(ID)\
+                PRIMARY KEY (ID)\
                 );"
 
 feedTable = "CREATE TABLE Feed (\
                 `user_id` INT NOT NULL AUTO_INCREMENT,\
                 `FeedList` VARCHAR(1000),\
-                PRIMARY KEY (User_id),\
-                FOREIGN KEY (User_id) REFERENCES User(ID)\
+                PRIMARY KEY (User_id)\
             );"
 
 
