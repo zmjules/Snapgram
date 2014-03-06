@@ -1,7 +1,7 @@
 var http = require('http'),
  querystring = require('querystring')
  
-var jsonUsers = JSON.stringify([{id: 1, name: 'steve', password: '1234'}, {'id': 5, 'name': 'darren', password: '5678'}]);
+var jsonUsers = JSON.stringify([{id: 1, name: 'steve', follows: [], password: '1234'}, {'id': 5, 'name': 'darren', follows: [1,3,4], password: '5678'}]);
 
  var options = {
    host: 'localhost',

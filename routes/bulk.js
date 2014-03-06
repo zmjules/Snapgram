@@ -70,6 +70,22 @@ exports.users = function(req, res){
 					error = err.message;
 				}
 			});
+			console.log(req.body[i]);
+			for (var j = 0; j < req.body[i].follows.length; j++)
+			{
+				req.models.Follow.create([
+				{
+					follower_id: req.body[i].id,
+					followee_id: req.body[i].follows[j]
+				}
+				], function (err, items) {
+					if (err) 
+					{
+						error = err.message;
+						console.log(error);
+					}
+				});
+			}
 		}
 
 		res.writeHead(200, {'Content-Type': 'text/plain'});
