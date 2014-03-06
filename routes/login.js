@@ -2,8 +2,6 @@
  * GET login page.
  */
 var path = require('path');
-//var imagemagick = require('imagemagick');
-//var gm = require('gm').subClass({ imageMagick: true });
 var fs = require('fs');
 
 exports.uploadPage = function(req, res, errorMessage){
@@ -19,7 +17,6 @@ exports.uploadAction = function(req, res, errorMessage){
   }
   else {
     var extension = path.extname(req.files.image.originalFilename).substring(1);
-    console.log(extension);
     
     // error if an image was not provided
     if (extension != 'jpg' && extension != 'gif' && extension != 'png' && extension != 'tif'){
@@ -28,17 +25,12 @@ exports.uploadAction = function(req, res, errorMessage){
     }
     // valid image provided 
     else {
-      console.log(req.files);
       fs.readFile(req.files.image.path, function (err, data) {
-      // ...
       var newPath = "./test/";
       fs.writeFile(newPath, data, function (err) {
         res.redirect("back");
       });
       });
-
-      console.log("Display path is " + req.files.image.path);
-
 
       // get field values for db
       var userID = parseInt(req.session.user.id);
@@ -66,7 +58,8 @@ exports.uploadAction = function(req, res, errorMessage){
                             }
                     }) */ 
 
-      
+    //TODO: add 'after create' hook to photo table so that we query the follow table and then add to the feed table 
+
     } 
   }
 }
