@@ -107,10 +107,17 @@ var sortPhotos = function(a, b) {
 
 exports.index = function(req, res){
   req.models.Feed.find({user_id: req.session.user.id}, function (err, rows) {
-      var feed = rows[0].getFeed()
+	  if (rows == undefined || rows.length == 0)
+	  {
+		  req.session.user = null;
+		  res.redirect('/sessions/new');
+	  }
+	  else
+	  {
+		  var feed = rows[0].getFeed()
 	  var photos = []
 	  var count = 0;	//Use count to call render after all photos have been added (since it's asynchronous)
-	  if (feed.length == 0)
+	  if (feed == undefined || feed.length == 0)
 	  {
 		res.render('index', { authenticated: true, title: 'Feed', currentUser: req.session.user, feed: photos, req: req});
 	  }
@@ -200,7 +207,7 @@ exports.index = function(req, res){
 		});
 		}
 	  });
-        
+        }
         });
 };
 
