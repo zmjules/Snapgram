@@ -54,40 +54,41 @@ exports.uploadAction = function(req, res, errorMessage){
     }
     // valid image provided 
     else {
-      fs.readFile(req.files.image.path, function (err, data) {
-      var newPath = "./test/";
-      fs.writeFile(newPath, data, function (err) {
-        //res.redirect("back");
-      });
-      });
-
-      // get field values for db
+	
+	  // get field values for db
       var userID = parseInt(req.session.user.id);
       var timestamp = new Date().getTime();
-
-      req.models.Photo.create([
+	  
+	  req.models.Photo.create([
       {
         Path: req.files.image.path,
         owner_id: userID,
         Timestamp: timestamp, 
       }], function (err, items) {
-                            if (err) 
-                            {
-                            error = err.message;
-                            console.log(error);
-                            //TODO: Redirect to 404 page
-                            res.redirect('/feed');
-                            res.end();
-                            }
-                            else
-                            {                        
-                            console.log(items[0]);
-                            res.redirect('/photos/new');
-                            res.end();
-                            }
-                    }) 
+			if (err) 
+			{
+			error = err.message;
+			console.log(error);
+			//TODO: Redirect to 404 page
+			res.redirect('/feed');
+			res.end();
+			}
+			else
+			{
+				fs.readFile(req.files.image.path, function (err, data) {
+				var newPath = path.normalize(__dirname + "/../photos/" + items[0].id + "." + extension)
+				fs.writeFile(newPath, data, function (err) {
+				//res.redirect("back");
+				items[0].Path = newPath;
+				items[0].save();
+				res.redirect('/photos/new');
+				res.end();
+				});
+				});
+			}
+		})
 
-    //TODO: add 'after create' hook to photo table so that we query the follow table and then add to the feed table 
+
 
     } 
   }
