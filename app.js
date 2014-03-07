@@ -17,6 +17,7 @@ app.use(express.bodyParser({keepExtensions: true, uploadDir: './test'}));
 
 app.use(orm.express("mysql://s513_b.rougeau:10013253@localhost/s513_b.rougeau", {
   define: function (db, models, next) {
+    db.settings.set('instance.cache', false);
     models.User = db.define("User", { 
         FirstName: String,
         LastName : String,
@@ -36,11 +37,19 @@ app.use(orm.express("mysql://s513_b.rougeau:10013253@localhost/s513_b.rougeau", 
                 console.log(error);
                 //TODO: Redirect to 404 page
                 }
-                else
-                {                        
-                console.log(items[0]);
-                }
             })
+		   models.Feed.create([
+			{
+				user_id: this.id,
+				FeedList: '[]'
+			}], function (err, newFeed) {
+				if (err) 
+				{
+					error = err.message;
+					console.log(error);
+					//TODO: Redirect to 500 page
+				}
+			})
         }
       }
     })
@@ -57,29 +66,7 @@ app.use(orm.express("mysql://s513_b.rougeau:10013253@localhost/s513_b.rougeau", 
               // add photos to all follower's feeds
               row.getFollower(function (err, follower){
                 follower.getFeed(function (err, feed){
-				  if (feed.length == 0)
-				  {
-					models.Feed.create([
-					{
-						user_id: follower.id,
-						FeedList: '[]'
-					}], function (err, newFeed) {
-						if (err) 
-						{
-							error = err.message;
-							console.log(error);
-							//TODO: Redirect to 500 page
-						}
-						else
-						{                        
-							newFeed[0].addToFeed(photo_id);
-						}
-					})
-				  }
-				  else
-				  {
-					feed[0].addToFeed(photo_id);
-				  }
+				  	feed[0].addToFeed(photo_id);
                 })
 				})
             })
