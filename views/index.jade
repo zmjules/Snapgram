@@ -15,8 +15,10 @@ block content
 					if photo.shared
 						span.
 							<a class='nameLabel' href='/users/#{photo.owner_id}'>#{photo.owner_name} </a>
-							shared by&nbsp
+							(shared by&nbsp
 						a.nameLabel(href='/users/#{photo.sharer_id}') #{photo.sharer_name}
+						span.
+							)
 					else
 						a.nameLabel(href='/users/#{photo.owner_id}') #{photo.owner_name}
 					p.timeLabel #{photo.timeAgo)
