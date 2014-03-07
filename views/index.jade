@@ -13,12 +13,14 @@ block content
 					- if (!photo.shared && photo.owner_id != currentUser.id)
 						a.share(href='/share/#{photo.id}') share
 						br
-				a.nameLabel(href='/users/#{photo.owner_id}')
-					p #{photo.owner_name}
-				if photo.shared
-					a.nameLabel(href='/users/#{photo.sharer_id}')
-						p (shared by #{photo.sharer_name})
-				p.timeLabel #{photo.timeAgo)
+					if photo.shared
+						span.
+							<a class='nameLabel' href='/users/#{photo.owner_id}'>#{photo.owner_name} </a>
+							shared by&nbsp
+						a.nameLabel(href='/users/#{photo.sharer_id}') #{photo.sharer_name}
+					else
+						a.nameLabel(href='/users/#{photo.owner_id}') #{photo.owner_name}
+					p.timeLabel #{photo.timeAgo)
 	if nextPage
 		a.more(href="/feed?page=#{nextPage}") More 
 	br
