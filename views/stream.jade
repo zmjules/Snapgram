@@ -11,36 +11,13 @@ block content
 		//all of this is for testing layout
 		each photo in photos
 			.thumbContainer
-				a(href='/#{photo.Path}') 
-					img(src='/#{photo.Path}' width = 400)
+				a(href='/photos/#{photo.id}.#{photo.extension}') 
+					img(src='/photos/thumbnail/#{photo.id}.#{photo.extension}' width = 400)
 				br
 				.labelContainer
 					a.share(href='/feed/') share
 					br
 					a.nameLabel(href='/feed/') Kody Dillman
 					p.timeLabel 2 mins ago
-		.thumbContainer
-			img(src='/testImages/2.jpg' width=400)
-			p.nameLabel Kody Dillman
-			p.timeLabel 2 mins ago
-		br
-		.thumbContainer
-			img(src='/testImages/3.gif' width=400)
-			p.nameLabel Kody Dillman
-			p.timeLabel 2 mins ago
-		.thumbContainer
-			img(src='/testImages/4.jpg' width=400)
-			p.nameLabel Kody Dillman
-			p.timeLabel 2 mins ago
-		br
-		.thumbContainer
-			img(src='/testImages/5.png' width=400)
-			p.nameLabel Kody Dillman
-			p.timeLabel 2 mins ago
-		.thumbContainer
-			img(src='/testImages/6.jpg' width=400)
-			p.nameLabel Kody Dillman
-			p.timeLabel 2 mins ago
-		br
-	//TODO: Add proper link.
+		//TODO: Add proper link.
 	a.more(href="/feed/") More 

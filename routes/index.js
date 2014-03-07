@@ -52,6 +52,9 @@ exports.stream = function(req, res){
                 }
 				
 				req.models.Photo.find({owner_id: id}, function (err, rows) {
+					rows.forEach( function(row) {
+						row.extension = row.Path.split(".")[1];
+					});
 				
 					res.render('stream', { authenticated: true, title: 'Stream', id: id, user: user, following: following, photos: rows});
 				});
