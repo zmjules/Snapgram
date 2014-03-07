@@ -129,6 +129,15 @@ exports.index = function(req, res){
 				if (count == feed.length)
 				{
 					photos.sort(sortPhotos);
+					for ( var i = 0; i < photos.length; i++)
+					{
+						if (photoIDs.indexOf(photos[i].id) == -1)
+						{
+							photoIDs.push(photos[i].id);
+							uniquePhotos.push(photos[i]);
+						}
+					}
+					photos = uniquePhotos;
 					if (!req.query.page)
 					{
 						req.query.page = 1;
@@ -160,6 +169,18 @@ exports.index = function(req, res){
 						if (count == feed.length)
 						{
 							photos.sort(sortPhotos);
+							uniquePhotos = [];
+							photoIDs = [];
+							//remove duplicates
+							for ( var i = 0; i < photos.length; i++)
+							{
+								if (photoIDs.indexOf(photos[i].id) == -1)
+								{
+									photoIDs.push(photos[i].id);
+									uniquePhotos.push(photos[i]);
+								}
+							}
+							photos = uniquePhotos;
 							if (!req.query.page)
 							{
 								req.query.page = 1;
@@ -255,6 +276,18 @@ exports.stream = function(req, res){
 													if (shareCount == rows.length)
 													{
 															photos.sort(sortPhotos);
+															uniquePhotos = [];
+															photoIDs = [];
+															//remove duplicates
+															for ( var i = 0; i < photos.length; i++)
+															{
+																if (photoIDs.indexOf(photos[i].id) == -1)
+																{
+																	photoIDs.push(photos[i].id);
+																	uniquePhotos.push(photos[i]);
+																}
+															}
+															photos = uniquePhotos;
 															if (!req.query.page)
 															{
 																req.query.page = 1;
@@ -271,6 +304,18 @@ exports.stream = function(req, res){
 									else
 									{
 										photos.sort(sortPhotos);
+										uniquePhotos = [];
+										photoIDs = [];
+										//remove duplicates
+										for ( var i = 0; i < photos.length; i++)
+										{
+											if (photoIDs.indexOf(photos[i].id) == -1)
+											{
+												photoIDs.push(photos[i].id);
+												uniquePhotos.push(photos[i]);
+											}
+										}
+										photos = uniquePhotos;
 										if (!req.query.page)
 										{
 											req.query.page = 1;
@@ -306,6 +351,18 @@ exports.stream = function(req, res){
 											if (shareCount == rows.length)
 											{
 													photos.sort(sortPhotos);
+													uniquePhotos = [];
+													photoIDs = [];
+													//remove duplicates
+													for ( var i = 0; i < photos.length; i++)
+													{
+														if (photoIDs.indexOf(photos[i].id) == -1)
+														{
+															photoIDs.push(photos[i].id);
+															uniquePhotos.push(photos[i]);
+														}
+													}
+													photos = uniquePhotos;
 													if (!req.query.page)
 													{
 														req.query.page = 1;
@@ -322,6 +379,18 @@ exports.stream = function(req, res){
 							else
 							{
 								photos.sort(sortPhotos);
+								uniquePhotos = [];
+								photoIDs = [];
+								//remove duplicates
+								for ( var i = 0; i < photos.length; i++)
+								{
+									if (photoIDs.indexOf(photos[i].id) == -1)
+									{
+										photoIDs.push(photos[i].id);
+										uniquePhotos.push(photos[i]);
+									}
+								}
+								photos = uniquePhotos;
 								if (!req.query.page)
 								{
 									req.query.page = 1;
