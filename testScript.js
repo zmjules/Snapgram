@@ -26,7 +26,7 @@ var jsonUsers = JSON.stringify([{id: 1, name: 'steve', follows: [], password: '1
  // complete the request
  request.end()
  
- var jsonPhotos = JSON.stringify([{id: 1, user_id: 1, path: '/steve/photo1', timestamp: 1234}, {id: 7, user_id: 1, path: '/steve/photo2', timestamp: 5678}]);
+ var jsonPhotos = JSON.stringify([{id: 1, user_id: 1, path: './photos/Canada.png', timestamp: 1234}, {id: 7, user_id: 1, path: './photos/Chile.png', timestamp: 5678}]);
 
  var options2 = {
    host: 'localhost',

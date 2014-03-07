@@ -4,9 +4,11 @@
  */
 
 exports.index = function(req, res){
-  var user = parseInt(req.session.user.id);
-
-  res.render('index', { authenticated: true, title: 'Feed', user: req.session.user });
+  req.models.Feed.find({user_id: req.session.user.id}, function (err, rows) {
+      console.log(rows[0].getFeed());
+        
+          res.render('index', { authenticated: true, title: 'Feed', user: req.session.user.id, feed: rows[0].getFeed(), req: req});
+        });
 };
 
 // TODO: Create stream.jade
