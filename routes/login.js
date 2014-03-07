@@ -11,15 +11,14 @@ exports.registerPage = function(req, res, errorMessage){
 exports.registerAction = function(req, res){
     var crypto = require('crypto');
     password = crypto.createHash('sha256').update(req.body.password).digest('hex');
-    if ( !req.body.firstName || !req.body.lastName || !req.body.username || !req.body.password )
+    if ( !req.body.fullName || !req.body.username || !req.body.password )
     {
         error = "Please fill in all fields";
         exports.registerPage(req, res, error);
     }
     req.models.User.create([
     {
-        FirstName: req.body.firstName,
-        LastName: req.body.lastName,
+        FullName: req.body.fullName,
         Username: req.body.username,
         Password: password,
     }

@@ -2,7 +2,7 @@ extends layout
 
 block content
 
-	h1.title #{user.FirstName} #{user.LastName}'s Stream 
+	h1.title #{user.FullName}'s Stream 
 	- if (authenticatedUserID != id)
 		if following
 			a.follow(href='/users/' + user.id + '/unfollow') Unfollow

@@ -120,7 +120,7 @@ exports.index = function(req, res){
 			photo.extension = photo.Path.split(".")[1];
 			photo.getOwner(function(err, user) {
 				count++;
-				photo.owner_name = user.FirstName;
+				photo.owner_name = user.FullName;
 				photo.timeAgo = time_ago_in_words(new Date(parseInt(photo.Timestamp)))
 				photos.push(photo);
 				if (count == feed.length)
@@ -188,13 +188,13 @@ exports.stream = function(req, res){
 				req.models.Photo.find({owner_id: id}, function (err, rows) {
 					if (rows.length == 0)
 					{
-						res.render('stream', { authenticated: true, authenticatedUser: req.session.user, title: 'Stream', id: id, user: user, following: following, photos: photos});
+						res.render('stream', { authenticated: true, authenticatedUserID: req.session.user.id, title: 'Stream', id: id, user: user, following: following, photos: photos});
 					}
 					rows.forEach( function(photo) {
 						photo.extension = photo.Path.split(".")[1];
 						photo.getOwner(function(err, user) {
 							count++;
-							photo.owner_name = user.FirstName;
+							photo.owner_name = user.FullName;
 							photo.timeAgo = time_ago_in_words(new Date(parseInt(photo.Timestamp)))
 							photos.push(photo);
 							if (count == rows.length)

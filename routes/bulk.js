@@ -59,8 +59,7 @@ exports.users = function(req, res){
 			req.models.User.create([
 			{
 				id: req.body[i].id,
-				FirstName: "Ju",
-				LastName: "Kobra",
+				FullName: "Bulk User",
 				Username: req.body[i].name,
 				Password: password
 			}

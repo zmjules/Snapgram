@@ -18,8 +18,7 @@ app.use(express.bodyParser({keepExtensions: true, uploadDir: './photos'}));
 app.use(orm.express("mysql://s513_b.rougeau:10013253@localhost/s513_b.rougeau", {
   define: function (db, models, next) {
     models.User = db.define("User", { 
-        FirstName: String,
-        LastName : String,
+        FullName : String,
         Username : String,
         Password : String
     }, {
