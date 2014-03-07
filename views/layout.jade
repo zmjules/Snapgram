@@ -5,8 +5,8 @@ html
 		link(rel='stylesheet', href='/stylesheets/style.css')
 	body
 		.header
-			if user
-				a.currentUser(href="/users/1") krdillma
+			if currentUser
+				a.currentUser(href="/users/#{currentUser.id}") #{currentUser.Username}
 			a(href='/') 
 				img(src='/images/snapgramLogo.png')
 			if authenticated

@@ -112,7 +112,7 @@ exports.index = function(req, res){
 	  var count = 0;	//Use count to call render after all photos have been added (since it's asynchronous)
 	  if (feed.length == 0)
 	  {
-		res.render('index', { authenticated: true, title: 'Feed', user: req.session.user, feed: photos, req: req});
+		res.render('index', { authenticated: true, title: 'Feed', currentUser: req.session.user, feed: photos, req: req});
 	  }
 	  feed.forEach(function(entry) {
 		if (entry.type == 'Photo')
@@ -135,7 +135,7 @@ exports.index = function(req, res){
 					}
 					var nextPage = photos.length > req.query.page*30 ? req.query.page+1 : 0;
 					photos = photos.slice((req.query.page-1)*30,req.query.page*30);
-					res.render('index', { authenticated: true, title: 'Feed', user: req.session.user, feed: photos, req: req, nextPage: nextPage});
+					res.render('index', { authenticated: true, currentUser: req.session.user, title: 'Feed', feed: photos, req: req, nextPage: nextPage});
 				}
 			});
 			
@@ -165,7 +165,7 @@ exports.index = function(req, res){
 							}
 							var nextPage = photos.length > req.query.page*30 ? req.query.page+1 : 0;
 							photos = photos.slice((req.query.page-1)*30,req.query.page*30);
-							res.render('index', { authenticated: true, title: 'Feed', user: req.session.user, feed: photos, req: req, nextPage: nextPage});
+							res.render('index', { authenticated: true, title: 'Feed', currentUser: req.session.user, feed: photos, req: req, nextPage: nextPage});
 						}
 					});
 				});
@@ -178,7 +178,6 @@ exports.index = function(req, res){
         });
 };
 
-// TODO: Create stream.jade
 // Create array of images.
 exports.stream = function(req, res){
 	// create photo array here
@@ -234,8 +233,6 @@ exports.stream = function(req, res){
 							photo.owner_name = user.FullName;
 							photo.timeAgo = time_ago_in_words(new Date(parseInt(photo.Timestamp)))
 							photos.push(photo);
-							console.log(photoCount);
-							console.log(rows.length);
 							if (photoCount == rows.length)
 							{
 								req.models.Share.find({sharer_id: id}, function (err, rows) {
@@ -244,7 +241,6 @@ exports.stream = function(req, res){
 									rows.forEach( function(share) {
 										share.getPhoto( function(err, photo) {
 											photo.shared = true;
-											console.log(photo + "shared");
 											photo.sharer_id = share.sharer_id;
 											photo.extension = photo.Path.split(".")[1];
 											photo.getOwner(function(err, user) {
@@ -263,7 +259,7 @@ exports.stream = function(req, res){
 															}
 															var nextPage = photos.length > req.query.page*30 ? req.query.page+1 : 0;
 															photos = photos.slice((req.query.page-1)*30,req.query.page*30);
-															res.render('stream', { authenticated: true, authenticatedUserID: req.session.user.id, title: 'Stream', id: id, user: user, following: following, photos: photos, nextPage: nextPage});
+															res.render('stream', { authenticated: true, currentUser: req.session.user, title: 'Stream', id: id, user: user, following: following, photos: photos, nextPage: nextPage});
 													}
 												});
 											});
@@ -279,7 +275,7 @@ exports.stream = function(req, res){
 										}
 										var nextPage = photos.length > req.query.page*30 ? req.query.page+1 : 0;
 										photos = photos.slice((req.query.page-1)*30,req.query.page*30);
-										res.render('stream', { authenticated: true, authenticatedUserID: req.session.user.id, title: 'Stream', id: id, user: user, following: following, photos: photos, nextPage: nextPage});
+										res.render('stream', { authenticated: true, currentUser: req.session.user, title: 'Stream', id: id, user: user, following: following, photos: photos, nextPage: nextPage});
 									}
 								});
 
@@ -313,7 +309,7 @@ exports.stream = function(req, res){
 													}
 													var nextPage = photos.length > req.query.page*30 ? req.query.page+1 : 0;
 													photos = photos.slice((req.query.page-1)*30,req.query.page*30);
-													res.render('stream', { authenticated: true, authenticatedUserID: req.session.user.id, title: 'Stream', id: id, user: user, following: following, photos: photos, nextPage: nextPage});
+													res.render('stream', { authenticated: true, currentUser: req.session.user, title: 'Stream', id: id, user: user, following: following, photos: photos, nextPage: nextPage});
 											}
 										});
 									});
@@ -329,7 +325,7 @@ exports.stream = function(req, res){
 								}
 								var nextPage = photos.length > req.query.page*30 ? req.query.page+1 : 0;
 								photos = photos.slice((req.query.page-1)*30,req.query.page*30);
-								res.render('stream', { authenticated: true, authenticatedUserID: req.session.user.id, title: 'Stream', id: id, user: user, following: following, photos: photos, nextPage: nextPage});
+								res.render('stream', { authenticated: true, currentUser: req.session.user, title: 'Stream', id: id, user: user, following: following, photos: photos, nextPage: nextPage});
 							}
 						});
 					}
@@ -398,7 +394,6 @@ exports.follow = function(req, res){
                             }
                             else
                             {                        
-                            console.log(items[0]);
                             res.redirect('/users/' + followeeID);
                             res.end();
                             }

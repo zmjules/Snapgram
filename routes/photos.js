@@ -34,7 +34,7 @@ exports.loadThumbnail = function(req, res){
 }
 
 exports.uploadPage = function(req, res, errorMessage){
-    res.render('upload', {authenticated: true, error: errorMessage });
+    res.render('upload', {currentUser: req.session.user, authenticated: true, error: errorMessage });
 }
 
 exports.uploadAction = function(req, res, errorMessage){
