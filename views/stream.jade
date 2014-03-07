@@ -3,10 +3,11 @@ extends layout
 block content
 
 	h1.title #{user.FirstName} #{user.LastName}'s Stream 
-	if following
-		a.follow(href='/users/' + user.id + '/unfollow') Unfollow
-	else
-		a.follow(href='/users/'+user.id+'/follow') Follow
+	- if (authenticatedUserID != id)
+		if following
+			a.follow(href='/users/' + user.id + '/unfollow') Unfollow
+		else
+			a.follow(href='/users/'+user.id+'/follow') Follow
 	.imageSpace
 		//all of this is for testing layout
 		each photo in photos

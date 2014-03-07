@@ -83,7 +83,7 @@ exports.stream = function(req, res){
 				req.models.Photo.find({owner_id: id}, function (err, rows) {
 					if (rows.length == 0)
 					{
-						res.render('stream', { authenticated: true, title: 'Stream', id: id, user: user, following: following, photos: photos});
+						res.render('stream', { authenticated: true, authenticatedUser: req.session.user, title: 'Stream', id: id, user: user, following: following, photos: photos});
 					}
 					rows.forEach( function(photo) {
 						photo.extension = photo.Path.split(".")[1];
@@ -94,7 +94,7 @@ exports.stream = function(req, res){
 							if (count == rows.length)
 							{
 								photos.sort(sortPhotos);
-								res.render('stream', { authenticated: true, title: 'Stream', id: id, user: user, following: following, photos: photos});
+								res.render('stream', { authenticated: true, authenticatedUserID: req.session.user.id, title: 'Stream', id: id, user: user, following: following, photos: photos});
 							}
 						});
 					});
