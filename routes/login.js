@@ -57,9 +57,10 @@ exports.loginAction = function(req, res){
            else if (rows.length > 1)
               throw new Error('Corrupted database');
            else if (rows[0].Password != password)
+		   {
               req.flash('NotValidErr','Incorrect password.');
-              error = "Incorrect password";
               res.redirect('/sessions/new');
+			}
        }
        else
        {
