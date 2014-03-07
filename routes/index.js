@@ -129,6 +129,9 @@ exports.index = function(req, res){
 				if (count == feed.length)
 				{
 					photos.sort(sortPhotos);
+					uniquePhotos = [];
+					photoIDs = [];
+					//remove duplicates
 					for ( var i = 0; i < photos.length; i++)
 					{
 						if (photoIDs.indexOf(photos[i].id) == -1)
