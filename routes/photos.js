@@ -48,10 +48,12 @@ exports.uploadAction = function(req, res, errorMessage){
       exports.uploadPage(req, res, error);    
   }
   else {
-    var extension = path.extname(req.files.image.originalFilename).substring(1);
-    
+    var info = req.files.image.type.split("/");
+    var type = info[0];
+	var extension = info[1];
+	
     // error if an image was not provided
-    if (extension != 'jpg' && extension != 'gif' && extension != 'png' && extension != 'tif'){
+    if (type != 'image'){
       error = "File Not An Image.";
       exports.uploadPage(req, res, error);   
     }
