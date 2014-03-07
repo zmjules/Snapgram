@@ -2,6 +2,10 @@
 /*
  * GET home page.
  */
+ 
+var sortPhotos = function(a, b) {
+	return ( (a.Timestamp > b.Timestamp) ? -1 : 1);
+}
 
 exports.index = function(req, res){
   req.models.Feed.find({user_id: req.session.user.id}, function (err, rows) {
@@ -22,6 +26,7 @@ exports.index = function(req, res){
 				photos.push(photo);
 				if (count == feed.length)
 				{
+					photos.sort(sortPhotos);
 					res.render('index', { authenticated: true, title: 'Feed', user: req.session.user, feed: photos, req: req});
 				}
 			});
@@ -88,6 +93,7 @@ exports.stream = function(req, res){
 							photos.push(photo);
 							if (count == rows.length)
 							{
+								photos.sort(sortPhotos);
 								res.render('stream', { authenticated: true, title: 'Stream', id: id, user: user, following: following, photos: photos});
 							}
 						});
