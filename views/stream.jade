@@ -19,10 +19,13 @@ block content
 					unless photo.shared
 						a.share(href='/share/#{photo.id}') share
 						br
-					a.nameLabel(href='/users/#{photo.owner_id}') #{photo.owner_name}
+						a.nameLabel(href='/users/#{photo.owner_id}') #{photo.owner_name}
 					if photo.shared
-						a.nameLabel(href='/users/#{photo.sharer_id}')
-							p (shared by #{photo.sharer_name})
+						p
+							span.
+								<a class='nameLabel' href='/users/#{photo.owner_id}'>#{photo.owner_name} </a>
+								shared by&nbsp
+							a.nameLabel(href='/users/#{photo.sharer_id}') #{photo.sharer_name}
 					p.timeLabel #{photo.timeAgo)
 		//TODO: Add proper link.
 	if nextPage
