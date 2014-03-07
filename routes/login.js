@@ -18,23 +18,34 @@ exports.registerAction = function(req, res){
         res.redirect('/users/new');
     }
     else {
-      req.models.User.create([
-      {
-          FullName: req.body.fullName,
-          Username: req.body.username,
-          Password: password,
-      }
-      ], function (err, items) {
-          if (err) 
-          {
-              if (err) throw err;
-          }
-          else
-          {
-              req.session.user = items[0];
-              res.redirect('/feed');
-          }
-      });
+	  req.models.User.find({Username: req.body.username}, function (err, results) {
+		  if (err) throw err;
+		  else if (results.length > 0)
+		  {
+			req.flash('NotValidErr','A user with this username already exists');
+			res.redirect('/users/new');
+		  }
+		  else
+		  {
+		  req.models.User.create([
+		  {
+			  FullName: req.body.fullName,
+			  Username: req.body.username,
+			  Password: password,
+		  }
+		  ], function (err, items) {
+			  if (err) 
+			  {
+				  if (err) throw err;
+			  }
+			  else
+			  {
+				  req.session.user = items[0];
+				  res.redirect('/feed');
+			  }
+		  });
+		  }
+	});
   }
 }
 
