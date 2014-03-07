@@ -16,16 +16,17 @@ block content
 					img(src='/photos/thumbnail/#{photo.id}.#{photo.extension}' width = 400)
 				br
 				.labelContainer
-					unless photo.shared
+					- if (!photo.shared && photo.owner_id != currentUser.id)
 						a.share(href='/share/#{photo.id}') share
 						br
-						a.nameLabel(href='/users/#{photo.owner_id}') #{photo.owner_name}
 					if photo.shared
 						p
 							span.
 								<a class='nameLabel' href='/users/#{photo.owner_id}'>#{photo.owner_name} </a>
 								shared by&nbsp
 							a.nameLabel(href='/users/#{photo.sharer_id}') #{photo.sharer_name}
+					else
+						a.nameLabel(href='/users/#{photo.owner_id}') #{photo.owner_name}
 					p.timeLabel #{photo.timeAgo)
 		//TODO: Add proper link.
 	if nextPage

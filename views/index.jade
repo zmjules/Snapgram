@@ -8,6 +8,11 @@ block content
 			.thumbContainer
 				a(href='/photos/#{photo.id}.#{photo.extension}') 
 					img(src='/photos/thumbnail/#{photo.id}.#{photo.extension}' width = 400)
+				br
+				.labelContainer
+					- if (!photo.shared && photo.owner_id != currentUser.id)
+						a.share(href='/share/#{photo.id}') share
+						br
 				a.nameLabel(href='/users/#{photo.owner_id}')
 					p #{photo.owner_name}
 				if photo.shared
