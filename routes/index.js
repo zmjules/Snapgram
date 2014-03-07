@@ -228,9 +228,9 @@ exports.stream = function(req, res){
 					{
 					rows.forEach( function(photo) {
 						photo.extension = photo.Path.split(".")[1];
-						photo.getOwner(function(err, user) {
+						photo.getOwner(function(err, owner) {
 							photoCount++;
-							photo.owner_name = user.FullName;
+							photo.owner_name = owner.FullName;
 							photo.timeAgo = time_ago_in_words(new Date(parseInt(photo.Timestamp)))
 							photos.push(photo);
 							if (photoCount == rows.length)
@@ -243,9 +243,9 @@ exports.stream = function(req, res){
 											photo.shared = true;
 											photo.sharer_id = share.sharer_id;
 											photo.extension = photo.Path.split(".")[1];
-											photo.getOwner(function(err, user) {
+											photo.getOwner(function(err, owner2) {
 												shareCount++;
-												photo.owner_name = user.FullName;
+												photo.owner_name = owner2.FullName;
 												photo.timeAgo = time_ago_in_words(new Date(parseInt(photo.Timestamp)))
 												share.getSharer(function( err, sharer) {
 													photo.sharer_name = sharer.FullName;
@@ -293,9 +293,9 @@ exports.stream = function(req, res){
 									photo.shared = true;
 									photo.sharer_id = share.sharer_id;
 									photo.extension = photo.Path.split(".")[1];
-									photo.getOwner(function(err, user) {
+									photo.getOwner(function(err, owner) {
 										shareCount++;
-										photo.owner_name = user.FullName;
+										photo.owner_name = owner.FullName;
 										photo.timeAgo = time_ago_in_words(new Date(parseInt(photo.Timestamp)))
 										share.getSharer(function( err, sharer) {
 											photo.sharer_name = sharer.FullName;
