@@ -26,9 +26,10 @@ followTable = "CREATE TABLE Follow (\
                 );"
 
 feedTable = "CREATE TABLE Feed (\
-                `user_id` INT NOT NULL AUTO_INCREMENT,\
+				`ID` INT NOT NULL AUTO_INCREMENT,\
+                `user_id` INT,\
                 `FeedList` VARCHAR(1000),\
-                PRIMARY KEY (User_id)\
+                PRIMARY KEY (ID)\
             );"
 
 

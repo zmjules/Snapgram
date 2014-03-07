@@ -28,18 +28,39 @@ app.use(orm.express("mysql://s513_b.rougeau:10013253@localhost/s513_b.rougeau", 
     }, {
       hooks: {
         afterCreate: function (next){
+		  var photo_id = this.id;
           models.Follow.find({followee_id: this.owner_id}, function(err, rows) {
             rows.forEach(function(row){
               // add photos to all follower's feeds
               row.getFollower(function (err, follower){
                 follower.getFeed(function (err, feed){
-                  feed.addToFeed(this.id);
+				  if (feed.length == 0)
+				  {
+					models.Feed.create([
+					{
+						user_id: follower.id,
+						FeedList: '[]'
+					}], function (err, newFeed) {
+						if (err) 
+						{
+							error = err.message;
+							console.log(error);
+							//TODO: Redirect to 500 page
+							res.redirect('/feed');
+							res.end();
+						}
+						else
+						{                        
+							newFeed[0].addToFeed(photo_id);
+						}
+					})
+				  }
+				  else
+				  {
+					feed[0].addToFeed(photo_id);
+				  }
                 })
-                this.owner_id.getFeed(function (err, feed){
-                  // add photos to user's own feed
-                  feed.addToFeed(this.id);
-                })
-              })
+				})
             })
         });
       }
@@ -54,11 +75,13 @@ app.use(orm.express("mysql://s513_b.rougeau:10013253@localhost/s513_b.rougeau", 
     }, {
         methods: {
             addToFeed: function (photoID) {
-                this.Feed = JSON.stringify(JSON.parse(this.Feed) + photoID);
+				currentList = JSON.parse(this.FeedList)
+				currentList.push(photoID);
+                this.FeedList = JSON.stringify(currentList);
                 this.save();
             },
             getFeed: function () {
-                return JSON.parse(this.Feed);
+                return JSON.parse(this.FeedList);
             }
     }
     });
