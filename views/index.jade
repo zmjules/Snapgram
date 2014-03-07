@@ -12,7 +12,6 @@ block content
 				.labelContainer
 					- if (!photo.shared && photo.owner_id != currentUser.id)
 						a.share(href='/share/#{photo.id}') share
-						br
 					if photo.shared
 						span.
 							<a class='nameLabel' href='/users/#{photo.owner_id}'>#{photo.owner_name} </a>

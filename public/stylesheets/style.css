@@ -65,11 +65,12 @@ a.follow:link, a.follow:visited, a.follow:hover, a.follow:active {
 }
 
 a.share:link, a.share:visited, a.share:hover, a.share:active {
+	position: absolute;
 	text-decoration:none;
 	color: white;
 	padding: 3px;
-	float: right;
-	margin-top: 20px;
+	right: 0px;
+	top: 0px;
 	display: inline-block;
 
 	background-color: rgb(83, 185, 233);
@@ -136,6 +137,13 @@ div.thumbContainer {
 }
 
 div.labelContainer {
+	position: relative;
+	padding-top: 3px;
+	margin-top: 0px;
+	border-width: 2px;
+}
+
+div.labelContainerShare {
 	padding-top: 3px;
 	margin-top: -20px;
 	border-width: 2px;
