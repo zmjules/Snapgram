@@ -5,9 +5,22 @@
 
 exports.index = function(req, res){
   req.models.Feed.find({user_id: req.session.user.id}, function (err, rows) {
-      console.log(rows[0].getFeed());
+      var feed = rows[0].getFeed()
+	  var photos = []
+	  var count = 0;	//Use count to call render after all photos have been added (since it's asynchronous)
+	  feed.forEach(function(entry) {
+		req.models.Photo.get(entry, function(err, photo)
+		{
+			count++;
+			photo.extension = photo.Path.split(".")[1];
+			photos.push(photo);
+			if (count == feed.length)
+			{
+				res.render('index', { authenticated: true, title: 'Feed', user: req.session.user.id, feed: photos, req: req});
+			}
+		});
+	  });
         
-          res.render('index', { authenticated: true, title: 'Feed', user: req.session.user.id, feed: rows[0].getFeed(), req: req});
         });
 };
 
