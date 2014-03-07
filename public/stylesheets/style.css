@@ -42,6 +42,14 @@ a.nameLabel:link, a.nameLabel:visited, a.nameLabel:hover, a.nameLabel:active {
 	color: black;
 }
 
+a.register:link, a.register:visited, a.register:hover, a.register:active {
+	text-decoration:none;
+	color: white;
+	font-size: 20px;
+	background-color: rgb(83, 185, 233); 
+	padding: 3px;
+}
+
 a.follow:link, a.follow:visited, a.follow:hover, a.follow:active {
 	margin-bottom: 0px;
 	text-decoration:none;

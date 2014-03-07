@@ -3,17 +3,15 @@ extends layout
 block content
   if typeof error == 'string'
     h3#ErrorMessage Error: #{error}
-  h1 Log In
+  h1.title Log In
   p
-  |   Don't have an account? 
-  a(href="/users/new") Click here
-  |   to register
+  |   <p class = bodytext>Don't have an account? <a class = 'register' href = '/users/new'> Register </a>
   form(method='post', action='/sessions/create')
-    p
-        label Username
+    p.bodytext
+        label Username&nbsp
         input(type='text',name='username')
-    p
-        label Password 
+    p.bodytext
+        label Password&nbsp 
         input(type='password', name='password')
     p
         input(type='submit', name='submit' value='Login')

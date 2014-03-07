@@ -4,9 +4,6 @@ block content
 
 	h1.title #{currentUser.FullName}'s Feed
 	.imageSpace
-		//all of this is for testing layout
-		- var num = 0;
-		- var owner;
 		each photo in feed
 			.thumbContainer
 				a(href='/photos/#{photo.id}.#{photo.extension}') 

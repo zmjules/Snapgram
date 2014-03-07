@@ -3,9 +3,9 @@ extends layout
 block content
   if typeof error == 'string'
     h3#ErrorMessage Error: #{error}
-  h1 Upload Photos
+  h1.title Upload Photos
   form(method='post', action='/photos/create' enctype='multipart/form-data')
-    p
+    p.bodytext
         label Image: 
         input(type='file',name='image')
     p
