@@ -30,24 +30,14 @@ app.use(orm.express("mysql://s513_b.rougeau:10013253@localhost/s513_b.rougeau", 
               follower_id: this.id,
               followee_id: this.id
             }], function (err, items) {
-              if (err) 
-                {
-                error = err.message;
-                console.log(error);
-                //TODO: Redirect to 404 page
-                }
+              if (err) throw err;
             })
 		   models.Feed.create([
 			{
 				user_id: this.id,
 				FeedList: '[]'
 			}], function (err, newFeed) {
-				if (err) 
-				{
-					error = err.message;
-					console.log(error);
-					//TODO: Redirect to 500 page
-				}
+				if (err) throw err;
 			})
         }
       }
@@ -61,10 +51,13 @@ app.use(orm.express("mysql://s513_b.rougeau:10013253@localhost/s513_b.rougeau", 
         afterCreate: function (next){
 		  var photo_id = this.id;
           models.Follow.find({followee_id: this.owner_id}, function(err, rows) {
+			if (err) throw err;
             rows.forEach(function(row){
               // add photos to all follower's feeds
               row.getFollower(function (err, follower){
+				if (err) throw err;
                 follower.getFeed(function (err, feed){
+					if (err) throw err;
 				  	feed[0].addToFeed(photo_id, "Photo");
                 })
 				})
@@ -99,10 +92,13 @@ app.use(orm.express("mysql://s513_b.rougeau:10013253@localhost/s513_b.rougeau", 
         afterCreate: function (next){
 		  var share_id = this.id;
           models.Follow.find({followee_id: this.sharer_id}, function(err, rows) {
+			if (err) throw err;
             rows.forEach(function(row){
               // add photos to all follower's feeds
               row.getFollower(function (err, follower){
+				if (err) throw err;
                 follower.getFeed(function (err, feed){
+					if (err) throw err;
 				  	feed[0].addToFeed(share_id, "Share");
                 })
 				})
@@ -139,7 +135,7 @@ app.use(express.cookieParser());
 app.use(express.cookieSession({'key': 'sid', 'secret': 'someSecret'}));
 app.use(app.router);
 
-/*
+
 //from http://www.hacksparrow.com/express-js-custom-error-pages-404-and-500.html
 // Handle 404
   app.use(function(req, res) {
@@ -150,7 +146,7 @@ app.use(app.router);
   app.use(function(error, req, res, next) {
      res.status(500).render('500.jade', {title: '500: Internal Server Error'});
   });
-*/
+
 
 // development only
 if ('development' == app.get('env')) {

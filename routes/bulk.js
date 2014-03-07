@@ -10,6 +10,7 @@ exports.clear = function(req, res){
 		photoClear = "DELETE FROM Photo"
 		followClear = "DELETE FROM Follow"
 		feedClear = "DELETE FROM Feed"
+		shareClear = "DELETE FROM Share"
 
 		mysql = require('mysql');
 		conn = mysql.createConnection({
@@ -34,6 +35,10 @@ exports.clear = function(req, res){
 		});
 		
 		conn.query(feedClear, function(err, rows, fields) {
+		   if (err) throw err;
+		});
+		
+		conn.query(shareClear, function(err, rows, fields) {
 		   if (err) throw err;
 		});
 
@@ -64,10 +69,7 @@ exports.users = function(req, res){
 				Password: password
 			}
 			], function (err, items) {
-				if (err) 
-				{
-					error = err.message;
-				}
+				if (err) throw err;
 			});
 			console.log(req.body[i]);
 			for (var j = 0; j < req.body[i].follows.length; j++)
@@ -78,11 +80,7 @@ exports.users = function(req, res){
 					followee_id: req.body[i].follows[j]
 				}
 				], function (err, items) {
-					if (err) 
-					{
-						error = err.message;
-						console.log(error);
-					}
+					if (err) throw err;
 				});
 			}
 		}
@@ -107,12 +105,9 @@ var loadPhotosIndividually = function(req, photos, i)
 		Timestamp: photos[i].timestamp
 	}
 	], function (err, items) {
-		if (err) 
-		{
-			error = err.message;
-			if (i+1 < photos.length)
-				loadPhotosIndividually(req, photos, i+1);
-		}
+		if (err) throw err;
+		if (i+1 < photos.length)
+			loadPhotosIndividually(req, photos, i+1);
 	});
 }
 
@@ -120,10 +115,7 @@ exports.photos = function(req, res){
 	if (req.query.password == "zorodi")
 	{
 		var crypto = require('crypto');
-		for (var i = 0; i < req.body.length; i++)
-		{
-			loadPhotosIndividually(req, req.body, 0);
-		}
+		loadPhotosIndividually(req, req.body, 0);
 
 		res.writeHead(200, {'Content-Type': 'text/plain'});
 		res.end('Added photos');

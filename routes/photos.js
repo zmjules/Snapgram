@@ -14,6 +14,7 @@ exports.load = function(req, res){
 		var image = gm(photo.Path);
 		image.stream(function (err, stdout, stderr)
 		{
+			if (err) throw err;
 			stdout.pipe(res); 
 		});
 	});
@@ -24,10 +25,12 @@ exports.loadThumbnail = function(req, res){
             'Content-Type':('image/' + req.params.ext)
 	})
 	req.models.Photo.get(req.params.id, function(err, photo) {
+		if (err) throw err;
 		var image = gm(photo.Path);
 		image.resize(400);
 		image.stream(function (err, stdout, stderr)
 		{
+			if (err) throw err;
 			stdout.pipe(res); 
 		});
 	});
@@ -65,20 +68,14 @@ exports.uploadAction = function(req, res, errorMessage){
         owner_id: userID,
         Timestamp: timestamp, 
       }], function (err, items) {
-			if (err) 
-			{
-			error = err.message;
-			console.log(error);
-			//TODO: Redirect to 404 page
-			res.redirect('/feed');
-			res.end();
-			}
+			if (err) throw err;
 			else
 			{
 				var newPath = path.normalize(__dirname + "/../photos/" + items[0].id + "." + extension)
 				fs.renameSync(req.files.image.path, newPath);
 				items[0].Path = newPath;
 				items[0].save(function (err) {
+					if (err) throw err;
 					res.redirect('/feed');
 				});
 			}

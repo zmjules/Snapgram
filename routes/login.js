@@ -25,8 +25,7 @@ exports.registerAction = function(req, res){
     ], function (err, items) {
         if (err) 
         {
-            error = err.message;
-            exports.registerPage(req, res, error);
+            if (err) throw err;
         }
         else
         {
@@ -44,7 +43,8 @@ exports.loginAction = function(req, res){
     var crypto = require('crypto');
     password = crypto.createHash('sha256').update(req.body.password).digest('hex');
     req.models.User.find({Username: req.body.username}, function(err, rows) {
-       if (err || rows.length != 1 || rows[0].Password != password)
+	   if (err) throw err;
+       if (rows.length != 1 || rows[0].Password != password)
        {
            if (rows.length == 0){
               error = "User does not exist";
@@ -53,8 +53,6 @@ exports.loginAction = function(req, res){
               error = "Multiple users found with this username (corrupted database)";
            else if (rows[0].Password != password)
               error = "Incorrect password";
-           else
-              error = err.message;
            exports.loginPage(req, res, error);
        }
        else

@@ -167,6 +167,7 @@ exports.index = function(req, res){
 					photo.timeAgo = time_ago_in_words(new Date(parseInt(photo.Timestamp)))
 					photo.sharer_id = share.sharer_id;
 					share.getSharer(function( err, sharer) {
+						if (err) throw err;
 						photo.sharer_name = sharer.FullName;
 						photos.push(photo);
 						if (count == feed.length)
@@ -213,26 +214,20 @@ exports.stream = function(req, res){
 	req.models.User.find({ID: id}, function(err, rows) {
        if (err || rows.length != 1)
        {
-           if (rows.length == 0)
+		   if (err) throw err;
+           else if (rows.length == 0)
               error = "User does not exist";
            else if (rows.length > 1)
               error = "Multiple users found with this username (corrupted database)";
-           else
-              error = err.message;
            console.log("Error: " + error);
-           //Need to redirect to 404 here
+		   res.status(404).render('404.jade', {title: '404: File Not Found'});
        }
        else
        {
             user = rows[0]
 
             req.models.Follow.find({follower_id: req.session.user.id, followee_id: id}, function(err, rows) {
-                if (err)
-                {
-                    error = err.message;
-                    console.log("Error: " + error);
-                    //TODO: Redirect to 500 page
-                }
+                if (err) throw err;
                 else if (rows.length == 0)
                 {
                    following = false;
@@ -249,11 +244,13 @@ exports.stream = function(req, res){
 				var shareCount = 0;
 				
 				req.models.Photo.find({owner_id: id}, function (err, rows) {
+					if (err) throw err;
 					if (rows.length > 0)
 					{
 					rows.forEach( function(photo) {
 						photo.extension = photo.Path.split(".")[1];
 						photo.getOwner(function(err, owner) {
+							if (err) throw err;
 							photoCount++;
 							photo.owner_name = owner.FullName;
 							photo.timeAgo = time_ago_in_words(new Date(parseInt(photo.Timestamp)))
@@ -261,19 +258,23 @@ exports.stream = function(req, res){
 							if (photoCount == rows.length)
 							{
 								req.models.Share.find({sharer_id: id}, function (err, rows) {
+									if (err) throw err;
 									if (rows.length > 0)
 									{
 									rows.forEach( function(share) {
 										share.getPhoto( function(err, photo) {
+											if (err) throw err;
 											photo.shared = true;
 											photo.sharer_id = share.sharer_id;
 											photo.Timestamp = share.Timestamp;
 											photo.extension = photo.Path.split(".")[1];
 											photo.getOwner(function(err, owner2) {
+												if (err) throw err;
 												shareCount++;
 												photo.owner_name = owner2.FullName;
 												photo.timeAgo = time_ago_in_words(new Date(parseInt(photo.Timestamp)))
 												share.getSharer(function( err, sharer) {
+													if (err) throw err;
 													photo.sharer_name = sharer.FullName;
 													photos.push(photo);
 													if (shareCount == rows.length)
@@ -336,19 +337,23 @@ exports.stream = function(req, res){
 					else
 					{
 						req.models.Share.find({sharer_id: id}, function (err, rows) {
+							if (err) throw err;
 							if (rows.length > 0)
 							{
 							rows.forEach( function(share) {
 								share.getPhoto( function(err, photo) {
+									if (err) throw err;
 									photo.Timestamp = share.Timestamp;
 									photo.shared = true;
 									photo.sharer_id = share.sharer_id;
 									photo.extension = photo.Path.split(".")[1];
 									photo.getOwner(function(err, owner) {
+										if (err) throw err;
 										shareCount++;
 										photo.owner_name = owner.FullName;
 										photo.timeAgo = time_ago_in_words(new Date(parseInt(photo.Timestamp)))
 										share.getSharer(function( err, sharer) {
+											if (err) throw err;
 											photo.sharer_name = sharer.FullName;
 											photos.push(photo);
 											if (shareCount == rows.length)
@@ -425,17 +430,10 @@ exports.follow = function(req, res){
 	
     //Check that the requested user to follow exists
     req.models.User.find({ID: followeeID}, function(err, rows) {
-     if (err || rows.length != 1)
+	 if (err) throw err;
+     if (rows.length != 1)
      {
-     if (rows.length == 0)
-       error = "User does not exist";
-     else if (rows.length > 1)
-       error = "Multiple users found with this username (corrupted database)";
-     else
-       error = err.message;
-     //TODO: Redirect to 404 page
-     console.log("Error: " + error);
-     res.redirect('/feed');
+		throw new Error("Can't find this user");
      }
      else
      {
@@ -443,13 +441,9 @@ exports.follow = function(req, res){
                if (err || rows.length != 0)
                {
                 if (err)
-                   error = err.message;
+                   throw err
                 else
-                   error = "Follow relationship already exists";
-                //TODO: Redirect to 404 page
-                console.log("Error: " + error);
-                res.redirect('/feed');
-                res.end();
+                   throw new Error("Follow relationship already exists");
                }
                else
                {
@@ -459,14 +453,7 @@ exports.follow = function(req, res){
                        followee_id: followeeID
                    }
                    ], function (err, items) {
-                            if (err) 
-                            {
-                            error = err.message;
-                            console.log(error);
-                            //TODO: Redirect to 404 page
-                            res.redirect('/feed');
-                            res.end();
-                            }
+                            if (err) throw err;
                             else
                             {                        
                             res.redirect('/users/' + followeeID);
@@ -496,24 +483,13 @@ if (followerID == followeeID)
 req.models.Follow.find({follower_id: followerID, followee_id: followeeID}, function(err, rows) {
         if (err || rows.length == 0)
         {
-            if (err)
-                error = err.message;
-            else
-                error = "Follow relationship doesn't exist";
-            //TODO: Redirect to 404 page
-            console.log("Error: " + error);
-            res.redirect('/feed');
+            if (err) throw err;
+            else throw new Error("Relationship does not exist");
         }
         else
         {
             rows[0].remove(function (err) {
-                if (err)
-                {
-                    error = err.message;
-                    //TODO: Redirect to 404 page
-                    console.log("Error: " + error);
-                    res.redirect('/feed');
-                }
+                if (err) throw err;
                 res.redirect('/users/' + followeeID);
              });
         }
@@ -532,14 +508,7 @@ req.models.Share.create([
 	   photo_id: photoID,
 	   Timestamp: timestamp
    }], function (err, items) {
-			if (err) 
-			{
-			error = err.message;
-			console.log(error);
-			//TODO: Redirect to 404 page
-			res.redirect('/feed');
-			res.end();
-			}
+			if (err) throw err;
 			else
 			{
 			res.redirect('/feed');
