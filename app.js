@@ -93,7 +93,7 @@ app.use(orm.express("mysql://s513_b.rougeau:10013253@localhost/s513_b.rougeau", 
     }
     });
 	models.Share = db.define("Share", {
-        //No fields, both fields are relationships defined below
+        Timestamp: Date
     }, {
       hooks: {
         afterCreate: function (next){

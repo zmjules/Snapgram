@@ -33,6 +33,7 @@ feedTable = "CREATE TABLE Feed (\
 			
 shareTable = "CREATE TABLE Share (\
 				`ID` INT NOT NULL AUTO_INCREMENT,\
+				`Timestamp` VARCHAR(30),\
                 `sharer_id` INT,\
                 `photo_id` INT,\
                 PRIMARY KEY (ID)\

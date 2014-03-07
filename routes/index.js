@@ -146,6 +146,7 @@ exports.index = function(req, res){
 		req.models.Share.get(entry.ID, function(err, share)
 		{
 			share.getPhoto( function(err, photo) {
+				photo.Timestamp = share.Timestamp;
 				photo.shared = true;
 				photo.extension = photo.Path.split(".")[1];
 				photo.getOwner(function(err, user) {
@@ -242,6 +243,7 @@ exports.stream = function(req, res){
 										share.getPhoto( function(err, photo) {
 											photo.shared = true;
 											photo.sharer_id = share.sharer_id;
+											photo.Timestamp = share.Timestamp;
 											photo.extension = photo.Path.split(".")[1];
 											photo.getOwner(function(err, user) {
 												shareCount++;
@@ -290,6 +292,7 @@ exports.stream = function(req, res){
 							{
 							rows.forEach( function(share) {
 								share.getPhoto( function(err, photo) {
+									photo.Timestamp = share.Timestamp;
 									photo.shared = true;
 									photo.sharer_id = share.sharer_id;
 									photo.extension = photo.Path.split(".")[1];
@@ -449,11 +452,13 @@ exports.share = function(req, res){
 // create photo array here
 var sharerID = parseInt(req.session.user.id);
 var photoID = req.params.id;
+var timestamp = new Date().getTime();
 
 req.models.Share.create([
    {
 	   sharer_id: sharerID,
-	   photo_id: photoID
+	   photo_id: photoID,
+	   Timestamp: timestamp
    }], function (err, items) {
 			if (err) 
 			{
