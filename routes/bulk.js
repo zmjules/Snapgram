@@ -98,25 +98,32 @@ exports.users = function(req, res){
 	}
 };
 
+var loadPhotosIndividually = function(req, photos, i)
+{
+	req.models.Photo.create([
+	{
+		id: photos[i].id,
+		owner_id: photos[i].user_id,
+		Path: photos[i].path,
+		Timestamp: photos[i].timestamp
+	}
+	], function (err, items) {
+		if (err) 
+		{
+			error = err.message;
+			if (i+1 < photos.length)
+				loadPhotosIndividually(req, photos, i+1);
+		}
+	});
+}
+
 exports.photos = function(req, res){
 	if (req.query.password == "zorodi")
 	{
 		var crypto = require('crypto');
 		for (var i = 0; i < req.body.length; i++)
 		{
-			req.models.Photo.create([
-			{
-				id: req.body[i].id,
-				owner_id: req.body[i].user_id,
-				Path: req.body[i].path,
-				Timestamp: req.body[i].timestamp
-			}
-			], function (err, items) {
-				if (err) 
-				{
-					error = err.message;
-				}
-			});
+			loadPhotosIndividually(req, req.body, 0);
 		}
 
 		res.writeHead(200, {'Content-Type': 'text/plain'});
