@@ -5,7 +5,8 @@ var path = require('path');
 var fs = require('fs');
 
 exports.registerPage = function(req, res, errorMessage){
-    res.render('register', { authenticated: (req.session.user !== null && req.session.user !== undefined), title: 'Register', error: errorMessage });
+    var err = req.flash('NotValidErr')[0];
+    res.render('register', { authenticated: (req.session.user !== null && req.session.user !== undefined), title: 'Register', error: err });
 }
 
 exports.registerAction = function(req, res){
@@ -13,30 +14,33 @@ exports.registerAction = function(req, res){
     password = crypto.createHash('sha256').update(req.body.password).digest('hex');
     if ( !req.body.fullName || !req.body.username || !req.body.password )
     {
-        error = "Please fill in all fields";
-        exports.registerPage(req, res, error);
+        req.flash('NotValidErr','Please fill in all fields');
+        res.redirect('/users/new');
     }
-    req.models.User.create([
-    {
-        FullName: req.body.fullName,
-        Username: req.body.username,
-        Password: password,
-    }
-    ], function (err, items) {
-        if (err) 
-        {
-            if (err) throw err;
-        }
-        else
-        {
-            req.session.user = items[0];
-            res.redirect('/feed');
-        }
-    });
+    else {
+      req.models.User.create([
+      {
+          FullName: req.body.fullName,
+          Username: req.body.username,
+          Password: password,
+      }
+      ], function (err, items) {
+          if (err) 
+          {
+              if (err) throw err;
+          }
+          else
+          {
+              req.session.user = items[0];
+              res.redirect('/feed');
+          }
+      });
+  }
 }
 
 exports.loginPage = function(req, res, errorMessage){
-    res.render('login', {authenticated: (req.session.user !== null && req.session.user !== undefined), title: 'Login', error: errorMessage });
+    var err = req.flash('NotValidErr')[0];
+    res.render('login', {authenticated: (req.session.user !== null && req.session.user !== undefined), title: 'Login', error: err });
 };
 
 exports.loginAction = function(req, res){
@@ -47,13 +51,15 @@ exports.loginAction = function(req, res){
        if (rows.length != 1 || rows[0].Password != password)
        {
            if (rows.length == 0){
-              error = "User does not exist";
+              req.flash('NotValidErr','User does not exist');
+              res.redirect('/sessions/new');
            }
            else if (rows.length > 1)
-              error = "Multiple users found with this username (corrupted database)";
+              throw new Error('Corrupted database');
            else if (rows[0].Password != password)
+              req.flash('NotValidErr','Incorrect password.');
               error = "Incorrect password";
-           exports.loginPage(req, res, error);
+              res.redirect('/sessions/new');
        }
        else
        {
