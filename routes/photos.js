@@ -78,9 +78,10 @@ exports.uploadAction = function(req, res, errorMessage){
 				var newPath = path.normalize(__dirname + "/../photos/" + items[0].id + "." + extension)
 				fs.renameSync(req.files.image.path, newPath);
 				items[0].Path = newPath;
-				items[0].save();
-				res.redirect('/feed');
-				res.end();
+				items[0].save(function (err) {
+					res.redirect('/feed');
+					res.end();
+				});
 			}
 		})
 
