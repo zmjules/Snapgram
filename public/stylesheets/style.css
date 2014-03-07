@@ -158,9 +158,8 @@ div.newDiv {
 }
 
 #ErrorMessage {
+	display: inline-block;
 	color: red;
-
-	border-width: 2px;
-	border: solid;
-	border-color: red;
+	background-color: white;
+	padding: 3px;
 }
