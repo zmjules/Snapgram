@@ -8,6 +8,7 @@ var orm = require('orm');
 var routes = require('./routes');
 var login = require('./routes/login');
 var bulk = require('./routes/bulk');
+var photos = require('./routes/photos');
 var http = require('http');
 var path = require('path');
 
@@ -176,8 +177,10 @@ app.get('/feed', routes.index);
 app.get('/users/:id', routes.stream);
 app.get('/users/:id/follow', routes.follow);
 app.get('/users/:id/unfollow', routes.unfollow);
-app.get('/photos/new', login.uploadPage);
-app.post('/photos/create', login.uploadAction);
+app.get('/photos/new', photos.uploadPage);
+app.post('/photos/create', photos.uploadAction);
+app.get('/photos/:id.:ext', photos.load);
+app.get('/photos/thumbnail/:id.:ext', photos.loadThumbnail);
 app.get('/', function(req, res) { res.redirect('/feed'); });
 
 // initialize server

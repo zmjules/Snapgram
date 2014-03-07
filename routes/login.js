@@ -4,66 +4,6 @@
 var path = require('path');
 var fs = require('fs');
 
-exports.uploadPage = function(req, res, errorMessage){
-    res.render('upload', {authenticated: true, error: errorMessage });
-}
-
-exports.uploadAction = function(req, res, errorMessage){
-
-  // return to upload page if no image provided
-  if ( !req.files.image ){
-      error = "File Not Found.";
-      exports.uploadPage(req, res, error);    
-  }
-  else {
-    var extension = path.extname(req.files.image.originalFilename).substring(1);
-    
-    // error if an image was not provided
-    if (extension != 'jpg' && extension != 'gif' && extension != 'png' && extension != 'tif'){
-      error = "File Not An Image.";
-      exports.uploadPage(req, res, error);   
-    }
-    // valid image provided 
-    else {
-      fs.readFile(req.files.image.path, function (err, data) {
-      var newPath = "./test/";
-      fs.writeFile(newPath, data, function (err) {
-        //res.redirect("back");
-      });
-      });
-
-      // get field values for db
-      var userID = parseInt(req.session.user.id);
-      var timestamp = new Date().getTime();
-
-      req.models.Photo.create([
-      {
-        Path: req.files.image.path,
-        owner_id: userID,
-        Timestamp: timestamp, 
-      }], function (err, items) {
-                            if (err) 
-                            {
-                            error = err.message;
-                            console.log(error);
-                            //TODO: Redirect to 404 page
-                            res.redirect('/feed');
-                            res.end();
-                            }
-                            else
-                            {                        
-                            console.log(items[0]);
-                            res.redirect('/photos/new');
-                            res.end();
-                            }
-                    }) 
-
-    //TODO: add 'after create' hook to photo table so that we query the follow table and then add to the feed table 
-
-    } 
-  }
-}
-
 exports.registerPage = function(req, res, errorMessage){
     res.render('register', { authenticated: (req.session.user !== null && req.session.user !== undefined), title: 'Register', error: errorMessage });
 }
