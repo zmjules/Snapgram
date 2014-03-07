@@ -102,7 +102,7 @@ var time_ago_in_words = function(date)
 };
  
 var sortPhotos = function(a, b) {
-	return ( (a.Timestamp > b.Timestamp) ? -1 : 1);
+	return ( (parseInt(a.Timestamp) > parseInt(b.Timestamp)) ? -1 : 1);
 }
 
 exports.index = function(req, res){
