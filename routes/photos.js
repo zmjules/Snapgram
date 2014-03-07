@@ -5,6 +5,7 @@ var path = require('path');
 var fs = require('fs');
 var imagemagick = require('imagemagick');
 var gm = require('gm').subClass({ imageMagick: true });
+var flash = require('connect-flash');
 
 exports.load = function(req, res){
 	res.writeHead(200, {
@@ -37,15 +38,15 @@ exports.loadThumbnail = function(req, res){
 }
 
 exports.uploadPage = function(req, res, errorMessage){
-    res.render('upload', {currentUser: req.session.user, authenticated: true, error: errorMessage });
+	var err = req.flash('NotValidErr')[0];
+    res.render('upload', {currentUser: req.session.user, authenticated: true, error: err});
 }
 
 exports.uploadAction = function(req, res, errorMessage){
-
   // return to upload page if no image provided
-  if ( !req.files.image ){
-      error = "File Not Found.";
-      exports.uploadPage(req, res, error);    
+  if ( req.files.image.size == 0 ){
+  	  req.flash('NotValidErr','File Not Found');
+      res.redirect('/photos/new');
   }
   else {
     var info = req.files.image.type.split("/");
@@ -54,8 +55,8 @@ exports.uploadAction = function(req, res, errorMessage){
 	
     // error if an image was not provided
     if (type != 'image'){
-      error = "File Not An Image.";
-      exports.uploadPage(req, res, error);   
+      req.flash('NotValidErr', 'File Not an Image');
+      res.redirect('/photos/new');
     }
     // valid image provided 
     else {

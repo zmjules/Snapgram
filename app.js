@@ -11,6 +11,7 @@ var bulk = require('./routes/bulk');
 var photos = require('./routes/photos');
 var http = require('http');
 var path = require('path');
+var flash = require('connect-flash');
 
 var app = express();
 app.use(express.bodyParser({keepExtensions: true, uploadDir: './photos'}));
@@ -133,7 +134,9 @@ app.use(express.methodOverride());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.cookieParser());
 app.use(express.cookieSession({'key': 'sid', 'secret': 'someSecret'}));
+app.use(flash());
 app.use(app.router);
+
 
 
 //from http://www.hacksparrow.com/express-js-custom-error-pages-404-and-500.html
