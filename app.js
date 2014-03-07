@@ -21,7 +21,29 @@ app.use(orm.express("mysql://s513_b.rougeau:10013253@localhost/s513_b.rougeau", 
         LastName : String,
         Username : String,
         Password : String
-    });
+    }, {
+      hooks: {
+        afterCreate: function (next){
+          models.Follow.create([
+            {
+              follower_id: this.id,
+              followee_id: this.id
+            }], function (err, items) {
+              if (err) 
+                {
+                error = err.message;
+                console.log(error);
+                //TODO: Redirect to 404 page
+                }
+                else
+                {                        
+                console.log(items[0]);
+                }
+            })
+        }
+      }
+    })
+
     models.Photo = db.define("Photo", { 
         Path: String,
         Timestamp : Date
@@ -46,8 +68,6 @@ app.use(orm.express("mysql://s513_b.rougeau:10013253@localhost/s513_b.rougeau", 
 							error = err.message;
 							console.log(error);
 							//TODO: Redirect to 500 page
-							res.redirect('/feed');
-							res.end();
 						}
 						else
 						{                        
