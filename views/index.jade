@@ -8,15 +8,15 @@ block content
 		- var num = 0;
 		- var owner;
 		each photo in feed
-			if (num < 30)
-				.thumbContainer
-					a(href='/photos/#{photo.id}.#{photo.extension}') 
-						img(src='/photos/thumbnail/#{photo.id}.#{photo.extension}' width = 400)
-					a.nameLabel(href='/users/#{photo.owner_id}')
-						p #{photo.owner_name}
-					p.timeLabel #{photo.timeAgo)
-					- num++
-	//TODO: Add proper link.
+			.thumbContainer
+				a(href='/photos/#{photo.id}.#{photo.extension}') 
+					img(src='/photos/thumbnail/#{photo.id}.#{photo.extension}' width = 400)
+				a.nameLabel(href='/users/#{photo.owner_id}')
+					p #{photo.owner_name}
+				if photo.shared
+					a.nameLabel(href='/users/#{photo.sharer_id}')
+						p (shared by #{photo.sharer_name})
+				p.timeLabel #{photo.timeAgo)
 	if nextPage
 		a.more(href="/feed?page=#{nextPage}") More 
 	br

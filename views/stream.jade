@@ -16,9 +16,13 @@ block content
 					img(src='/photos/thumbnail/#{photo.id}.#{photo.extension}' width = 400)
 				br
 				.labelContainer
-					a.share(href='/feed/') share
-					br
+					unless photo.shared
+						a.share(href='/share/#{photo.id}') share
+						br
 					a.nameLabel(href='/users/#{photo.owner_id}') #{photo.owner_name}
+					if photo.shared
+						a.nameLabel(href='/users/#{photo.sharer_id}')
+							p (shared by #{photo.sharer_name})
 					p.timeLabel #{photo.timeAgo)
 		//TODO: Add proper link.
 	if nextPage

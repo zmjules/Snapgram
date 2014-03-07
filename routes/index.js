@@ -115,8 +115,11 @@ exports.index = function(req, res){
 		res.render('index', { authenticated: true, title: 'Feed', user: req.session.user, feed: photos, req: req});
 	  }
 	  feed.forEach(function(entry) {
-		req.models.Photo.get(entry, function(err, photo)
+		if (entry.type == 'Photo')
 		{
+		req.models.Photo.get(entry.ID, function(err, photo)
+		{
+			photo.shared = false;
 			photo.extension = photo.Path.split(".")[1];
 			photo.getOwner(function(err, user) {
 				count++;
@@ -137,6 +140,39 @@ exports.index = function(req, res){
 			});
 			
 		});
+		}
+		else
+		{
+		req.models.Share.get(entry.ID, function(err, share)
+		{
+			share.getPhoto( function(err, photo) {
+				photo.shared = true;
+				photo.extension = photo.Path.split(".")[1];
+				photo.getOwner(function(err, user) {
+					count++;
+					photo.owner_name = user.FullName;
+					photo.timeAgo = time_ago_in_words(new Date(parseInt(photo.Timestamp)))
+					photo.sharer_id = share.sharer_id;
+					share.getSharer(function( err, sharer) {
+						photo.sharer_name = sharer.FullName;
+						photos.push(photo);
+						if (count == feed.length)
+						{
+							photos.sort(sortPhotos);
+							if (!req.query.page)
+							{
+								req.query.page = 1;
+							}
+							var nextPage = photos.length > req.query.page*30 ? req.query.page+1 : 0;
+							photos = photos.slice((req.query.page-1)*30,req.query.page*30);
+							res.render('index', { authenticated: true, title: 'Feed', user: req.session.user, feed: photos, req: req, nextPage: nextPage});
+						}
+					});
+				});
+			});
+			
+		});
+		}
 	  });
         
         });
@@ -183,21 +219,108 @@ exports.stream = function(req, res){
                 }
 				
 				var photos = [];
-				var count = 0;
+				
+				//Deal with the asynchronicity (it's a word!)
+				var photoCount = 0;
+				var shareCount = 0;
 				
 				req.models.Photo.find({owner_id: id}, function (err, rows) {
-					if (rows.length == 0)
+					if (rows.length > 0)
 					{
-						res.render('stream', { authenticated: true, authenticatedUserID: req.session.user.id, title: 'Stream', id: id, user: user, following: following, photos: photos});
-					}
 					rows.forEach( function(photo) {
 						photo.extension = photo.Path.split(".")[1];
 						photo.getOwner(function(err, user) {
-							count++;
+							photoCount++;
 							photo.owner_name = user.FullName;
 							photo.timeAgo = time_ago_in_words(new Date(parseInt(photo.Timestamp)))
 							photos.push(photo);
-							if (count == rows.length)
+							console.log(photoCount);
+							console.log(rows.length);
+							if (photoCount == rows.length)
+							{
+								req.models.Share.find({sharer_id: id}, function (err, rows) {
+									if (rows.length > 0)
+									{
+									rows.forEach( function(share) {
+										share.getPhoto( function(err, photo) {
+											photo.shared = true;
+											console.log(photo + "shared");
+											photo.sharer_id = share.sharer_id;
+											photo.extension = photo.Path.split(".")[1];
+											photo.getOwner(function(err, user) {
+												shareCount++;
+												photo.owner_name = user.FullName;
+												photo.timeAgo = time_ago_in_words(new Date(parseInt(photo.Timestamp)))
+												share.getSharer(function( err, sharer) {
+													photo.sharer_name = sharer.FullName;
+													photos.push(photo);
+													if (shareCount == rows.length)
+													{
+															photos.sort(sortPhotos);
+															if (!req.query.page)
+															{
+																req.query.page = 1;
+															}
+															var nextPage = photos.length > req.query.page*30 ? req.query.page+1 : 0;
+															photos = photos.slice((req.query.page-1)*30,req.query.page*30);
+															res.render('stream', { authenticated: true, authenticatedUserID: req.session.user.id, title: 'Stream', id: id, user: user, following: following, photos: photos, nextPage: nextPage});
+													}
+												});
+											});
+										});
+									});
+									}
+									else
+									{
+										photos.sort(sortPhotos);
+										if (!req.query.page)
+										{
+											req.query.page = 1;
+										}
+										var nextPage = photos.length > req.query.page*30 ? req.query.page+1 : 0;
+										photos = photos.slice((req.query.page-1)*30,req.query.page*30);
+										res.render('stream', { authenticated: true, authenticatedUserID: req.session.user.id, title: 'Stream', id: id, user: user, following: following, photos: photos, nextPage: nextPage});
+									}
+								});
+
+							}
+						});
+					});
+					}
+					else
+					{
+						req.models.Share.find({sharer_id: id}, function (err, rows) {
+							if (rows.length > 0)
+							{
+							rows.forEach( function(share) {
+								share.getPhoto( function(err, photo) {
+									photo.shared = true;
+									photo.sharer_id = share.sharer_id;
+									photo.extension = photo.Path.split(".")[1];
+									photo.getOwner(function(err, user) {
+										shareCount++;
+										photo.owner_name = user.FullName;
+										photo.timeAgo = time_ago_in_words(new Date(parseInt(photo.Timestamp)))
+										share.getSharer(function( err, sharer) {
+											photo.sharer_name = sharer.FullName;
+											photos.push(photo);
+											if (shareCount == rows.length)
+											{
+													photos.sort(sortPhotos);
+													if (!req.query.page)
+													{
+														req.query.page = 1;
+													}
+													var nextPage = photos.length > req.query.page*30 ? req.query.page+1 : 0;
+													photos = photos.slice((req.query.page-1)*30,req.query.page*30);
+													res.render('stream', { authenticated: true, authenticatedUserID: req.session.user.id, title: 'Stream', id: id, user: user, following: following, photos: photos, nextPage: nextPage});
+											}
+										});
+									});
+								});
+							});
+							}
+							else
 							{
 								photos.sort(sortPhotos);
 								if (!req.query.page)
@@ -209,9 +332,8 @@ exports.stream = function(req, res){
 								res.render('stream', { authenticated: true, authenticatedUserID: req.session.user.id, title: 'Stream', id: id, user: user, following: following, photos: photos, nextPage: nextPage});
 							}
 						});
-					});
+					}
 				});
-                                   
            });
          }
      });
@@ -326,4 +448,31 @@ req.models.Follow.find({follower_id: followerID, followee_id: followeeID}, funct
              });
         }
      });
+};
+
+exports.share = function(req, res){
+// create photo array here
+var sharerID = parseInt(req.session.user.id);
+var photoID = req.params.id;
+
+req.models.Share.create([
+   {
+	   sharer_id: sharerID,
+	   photo_id: photoID
+   }], function (err, items) {
+			if (err) 
+			{
+			error = err.message;
+			console.log(error);
+			//TODO: Redirect to 404 page
+			res.redirect('/feed');
+			res.end();
+			}
+			else
+			{
+			res.redirect('/feed');
+			res.end();
+			}
+	})
+
 };
