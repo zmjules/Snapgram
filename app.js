@@ -119,6 +119,7 @@ app.use(express.cookieParser());
 app.use(express.cookieSession({'key': 'sid', 'secret': 'someSecret'}));
 app.use(app.router);
 
+/*
 //from http://www.hacksparrow.com/express-js-custom-error-pages-404-and-500.html
 // Handle 404
   app.use(function(req, res) {
@@ -129,6 +130,7 @@ app.use(app.router);
   app.use(function(error, req, res, next) {
      res.status(500).render('500.jade', {title: '500: Internal Server Error'});
   });
+*/
 
 // development only
 if ('development' == app.get('env')) {
