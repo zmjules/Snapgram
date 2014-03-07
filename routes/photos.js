@@ -80,7 +80,6 @@ exports.uploadAction = function(req, res, errorMessage){
 				items[0].Path = newPath;
 				items[0].save(function (err) {
 					res.redirect('/feed');
-					res.end();
 				});
 			}
 		})
