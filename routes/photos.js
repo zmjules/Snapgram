@@ -75,16 +75,12 @@ exports.uploadAction = function(req, res, errorMessage){
 			}
 			else
 			{
-				fs.readFile(req.files.image.path, function (err, data) {
 				var newPath = path.normalize(__dirname + "/../photos/" + items[0].id + "." + extension)
-				fs.writeFile(newPath, data, function (err) {
-				//res.redirect("back");
+				fs.renameSync(req.files.image.path, newPath);
 				items[0].Path = newPath;
 				items[0].save();
-				res.redirect('/photos/new');
+				res.redirect('/feed');
 				res.end();
-				});
-				});
 			}
 		})
 
