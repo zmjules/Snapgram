@@ -21,4 +21,5 @@ block content
 					a.nameLabel(href='/users/#{photo.owner_id}') #{photo.owner_name}
 					p.timeLabel #{photo.timeAgo)
 		//TODO: Add proper link.
-	a.more(href="/feed/") More 
+	if nextPage
+		a.more(href="/users/#{user.id}?page=#{nextPage}") More 

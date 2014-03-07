@@ -126,7 +126,13 @@ exports.index = function(req, res){
 				if (count == feed.length)
 				{
 					photos.sort(sortPhotos);
-					res.render('index', { authenticated: true, title: 'Feed', user: req.session.user, feed: photos, req: req});
+					if (!req.query.page)
+					{
+						req.query.page = 1;
+					}
+					var nextPage = photos.length > req.query.page*30 ? req.query.page+1 : 0;
+					photos = photos.slice((req.query.page-1)*30,req.query.page*30);
+					res.render('index', { authenticated: true, title: 'Feed', user: req.session.user, feed: photos, req: req, nextPage: nextPage});
 				}
 			});
 			
@@ -194,7 +200,13 @@ exports.stream = function(req, res){
 							if (count == rows.length)
 							{
 								photos.sort(sortPhotos);
-								res.render('stream', { authenticated: true, authenticatedUserID: req.session.user.id, title: 'Stream', id: id, user: user, following: following, photos: photos});
+								if (!req.query.page)
+								{
+									req.query.page = 1;
+								}
+								var nextPage = photos.length > req.query.page*30 ? req.query.page+1 : 0;
+								photos = photos.slice((req.query.page-1)*30,req.query.page*30);
+								res.render('stream', { authenticated: true, authenticatedUserID: req.session.user.id, title: 'Stream', id: id, user: user, following: following, photos: photos, nextPage: nextPage});
 							}
 						});
 					});

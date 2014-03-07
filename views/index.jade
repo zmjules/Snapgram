@@ -17,5 +17,6 @@ block content
 					p.timeLabel #{photo.timeAgo)
 					- num++
 	//TODO: Add proper link.
-	a.more(href="/feed/") More 
+	if nextPage
+		a.more(href="/feed?page=#{nextPage}") More 
 	br
