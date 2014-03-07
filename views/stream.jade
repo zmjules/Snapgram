@@ -19,6 +19,6 @@ block content
 					a.share(href='/feed/') share
 					br
 					a.nameLabel(href='/users/#{photo.owner_id}') #{photo.owner_name}
-					p.timeLabel 2 mins ago
+					p.timeLabel #{photo.timeAgo)
 		//TODO: Add proper link.
 	a.more(href="/feed/") More 

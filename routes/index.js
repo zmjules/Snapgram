@@ -2,6 +2,104 @@
 /*
  * GET home page.
  */
+
+
+var time_between_in_words = function(from_date, to_date){
+    var result = (to_date - from_date);
+    if (result < 0)
+    {
+	return ('Invalid parameters: to_date should be later than from_date')
+    }
+    if (result < 1000)
+    {
+    	return 'a moment';
+    }
+    else
+    {
+       var years = (to_date.getFullYear()) - (from_date.getFullYear());
+       var months = (to_date.getMonth()) - (from_date.getMonth());
+       if (years > 0)
+       {
+        if (months < 0)
+        {
+           years--;
+           months += 12;
+        }
+        if (years > 0)
+        {
+           return (years + (years!=1?' years':' year'));
+        }
+       }
+       if (months > 0)
+       {
+        var days = (to_date.getDate()) - (from_date.getDate());
+        if (days < 0)
+        {
+           months--;
+        }
+        if (months > 0)
+        {
+           return (months + (months!=1?' months':' month'));
+        }
+       }
+       var diff = to_date - from_date;
+       var oneDay = 1000 * 60 * 60 * 24;
+       var days = Math.floor(diff / oneDay);
+       var hours = (to_date.getHours()) - (from_date.getHours());
+       if (days > 0)
+       {
+        if (hours < 0)
+        {
+           days--;
+           hours += 24;
+        }
+        if (days > 0)
+        {
+           if (days >= 7)
+           {
+            return (Math.floor(days/7) + (Math.floor(days/7)!=1?' weeks':' week'));
+           }
+           return (days + (days!=1?' days':' day'));
+        }
+       }
+       else if (to_date.getDate() != from_date.getDate())
+       {
+        hours += 24;
+       }
+       var minutes = (to_date.getMinutes()) - (from_date.getMinutes());
+       if (hours > 0)
+       {
+        if (minutes < 0)
+        {
+           hours--;
+           minutes += 60;
+        }
+        if (hours > 0)
+        {
+           return (hours + (hours!=1?' hours':' hour'));
+        }
+       }
+       var seconds = (to_date.getSeconds()) - (from_date.getSeconds());
+       if (minutes > 0)
+       {
+        if (seconds < 0)
+        {
+           minutes--;
+           seconds += 60;
+        }
+        if (minutes > 0)
+        {
+           return (minutes + (minutes!=1?' minutes':' minute'));
+        }
+       }
+       return (seconds + (seconds!=1?' seconds':' second'));
+    }
+};
+
+var time_ago_in_words = function(date)
+{
+   return(time_between_in_words(date, new Date()) + " ago");
+};
  
 var sortPhotos = function(a, b) {
 	return ( (a.Timestamp > b.Timestamp) ? -1 : 1);
@@ -23,6 +121,7 @@ exports.index = function(req, res){
 			photo.getOwner(function(err, user) {
 				count++;
 				photo.owner_name = user.FirstName;
+				photo.timeAgo = time_ago_in_words(new Date(parseInt(photo.Timestamp)))
 				photos.push(photo);
 				if (count == feed.length)
 				{
@@ -90,6 +189,7 @@ exports.stream = function(req, res){
 						photo.getOwner(function(err, user) {
 							count++;
 							photo.owner_name = user.FirstName;
+							photo.timeAgo = time_ago_in_words(new Date(parseInt(photo.Timestamp)))
 							photos.push(photo);
 							if (count == rows.length)
 							{
