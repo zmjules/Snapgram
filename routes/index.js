@@ -8,16 +8,24 @@ exports.index = function(req, res){
       var feed = rows[0].getFeed()
 	  var photos = []
 	  var count = 0;	//Use count to call render after all photos have been added (since it's asynchronous)
+	  if (feed.length == 0)
+	  {
+		res.render('index', { authenticated: true, title: 'Feed', user: req.session.user, feed: photos, req: req});
+	  }
 	  feed.forEach(function(entry) {
 		req.models.Photo.get(entry, function(err, photo)
 		{
-			count++;
 			photo.extension = photo.Path.split(".")[1];
-			photos.push(photo);
-			if (count == feed.length)
-			{
-				res.render('index', { authenticated: true, title: 'Feed', user: req.session.user.id, feed: photos, req: req});
-			}
+			photo.getOwner(function(err, user) {
+				count++;
+				photo.owner_name = user.FirstName;
+				photos.push(photo);
+				if (count == feed.length)
+				{
+					res.render('index', { authenticated: true, title: 'Feed', user: req.session.user, feed: photos, req: req});
+				}
+			});
+			
 		});
 	  });
         
@@ -64,12 +72,26 @@ exports.stream = function(req, res){
                     following = true;
                 }
 				
-				req.models.Photo.find({owner_id: id}, function (err, rows) {
-					rows.forEach( function(row) {
-						row.extension = row.Path.split(".")[1];
-					});
+				var photos = [];
+				var count = 0;
 				
-					res.render('stream', { authenticated: true, title: 'Stream', id: id, user: user, following: following, photos: rows});
+				req.models.Photo.find({owner_id: id}, function (err, rows) {
+					if (rows.length == 0)
+					{
+						res.render('stream', { authenticated: true, title: 'Stream', id: id, user: user, following: following, photos: photos});
+					}
+					rows.forEach( function(photo) {
+						photo.extension = photo.Path.split(".")[1];
+						photo.getOwner(function(err, user) {
+							count++;
+							photo.owner_name = user.FirstName;
+							photos.push(photo);
+							if (count == rows.length)
+							{
+								res.render('stream', { authenticated: true, title: 'Stream', id: id, user: user, following: following, photos: photos});
+							}
+						});
+					});
 				});
                                    
            });

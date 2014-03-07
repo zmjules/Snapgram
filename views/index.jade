@@ -12,8 +12,8 @@ block content
 				.thumbContainer
 					a(href='/photos/thumbnail/#{photo.id}.#{photo.extension}') 
 						img(src='/photos/#{photo.id}.#{photo.extension}' width = 400)
-					a.nameLabel(href='/feed/')
-						p #{photo.owner_id}
+					a.nameLabel(href='/users/#{photo.owner_id}')
+						p #{photo.owner_name}
 					p.timeLabel 2 mins ago
 					- num++
 	//TODO: Add proper link.
