@@ -48,10 +48,11 @@ exports.stream = function(req, res){
                 {
                     following = true;
                 }
-
-                console.log('ID: ' + req.params.id);
-
-			    res.render('stream', { authenticated: true, title: 'Stream', id: id, user: user, following: following});
+				
+				req.models.Photo.find({owner_id: id}, function (err, rows) {
+				
+					res.render('stream', { authenticated: true, title: 'Stream', id: id, user: user, following: following, photos: rows});
+				});
                                    
            });
          }

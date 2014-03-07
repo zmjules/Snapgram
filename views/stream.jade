@@ -9,15 +9,16 @@ block content
 		a.follow(href='/users/'+user.id+'/follow') Follow
 	.imageSpace
 		//all of this is for testing layout
-		.thumbContainer
-			a(href='/testImages/1.jpg') 
-				img(src='/testImages/1.jpg' width = 400)
-			br
-			.labelContainer
-				a.share(href='/feed/') share
+		each photo in photos
+			.thumbContainer
+				a(href='/#{photo.Path}') 
+					img(src='/#{photo.Path}' width = 400)
 				br
-				a.nameLabel(href='/feed/') Kody Dillman
-				p.timeLabel 2 mins ago
+				.labelContainer
+					a.share(href='/feed/') share
+					br
+					a.nameLabel(href='/feed/') Kody Dillman
+					p.timeLabel 2 mins ago
 		.thumbContainer
 			img(src='/testImages/2.jpg' width=400)
 			p.nameLabel Kody Dillman
