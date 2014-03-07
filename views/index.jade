@@ -8,12 +8,18 @@ block content
 			.thumbContainer
 				a(href='/photos/#{photo.id}.#{photo.extension}') 
 					img(src='/photos/thumbnail/#{photo.id}.#{photo.extension}' width = 400)
-				a.nameLabel(href='/users/#{photo.owner_id}')
-					p #{photo.owner_name}
-				if photo.shared
-					a.nameLabel(href='/users/#{photo.sharer_id}')
-						p (shared by #{photo.sharer_name})
-				p.timeLabel #{photo.timeAgo)
+				br
+				.labelContainer
+					unless photo.shared
+						a.share(href='/share/#{photo.id}') share
+						br
+						a.nameLabel(href='/users/#{photo.owner_id}') #{photo.owner_name}
+					if photo.shared
+						span.
+							<a class='nameLabel' href='/users/#{photo.owner_id}'>#{photo.owner_name} </a>
+							shared by&nbsp
+						a.nameLabel(href='/users/#{photo.sharer_id}') #{photo.sharer_name}
+					p.timeLabel #{photo.timeAgo)
 	if nextPage
 		a.more(href="/feed?page=#{nextPage}") More 
 	br
