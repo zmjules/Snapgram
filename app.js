@@ -16,7 +16,7 @@ var flash = require('connect-flash');
 var app = express();
 app.use(express.bodyParser({keepExtensions: true, uploadDir: './photos'}));
 
-app.use(orm.express("mysql://s513_b.rougeau:10013253@localhost/s513_b.rougeau", {
+app.use(orm.express("mysql://s513_krdillma:10083537@web2.cpsc.ucalgary.ca/s513_krdillma", {
   define: function (db, models, next) {
 	db.settings.set('instance.cache', false);
     models.User = db.define("User", { 
@@ -123,7 +123,7 @@ app.use(orm.express("mysql://s513_b.rougeau:10013253@localhost/s513_b.rougeau", 
                   
                   
 // all environments
-app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT || 8050);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.use(express.favicon());
