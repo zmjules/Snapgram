@@ -129,53 +129,15 @@ exports.index = function(req, res){
 			photo.shared = false;
 			photo.extension = photo.Path.split(".")[1];
 			photo.getOwner(function(err, user) {
-				count++;
 				photo.owner_name = user.FullName;
 				photo.timeAgo = time_ago_in_words(new Date(parseInt(photo.Timestamp)))
-				photos.push(photo);
-				if (count == feed.length)
+				req.models.Share.find({photo_id: photo.id, sharer_id: req.session.user.id}, function(err, shared)
 				{
-					photos.sort(sortPhotos);
-					uniquePhotos = [];
-					photoIDs = [];
-					//remove duplicates
-					for ( var i = 0; i < photos.length; i++)
+					if (err) throw err;
+					else
 					{
-						if (photoIDs.indexOf(photos[i].id) == -1)
-						{
-							photoIDs.push(photos[i].id);
-							uniquePhotos.push(photos[i]);
-						}
-					}
-					photos = uniquePhotos;
-					if (!req.query.page)
-					{
-						req.query.page = 1;
-					}
-					var nextPage = photos.length > req.query.page*30 ? req.query.page+1 : 0;
-					photos = photos.slice((req.query.page-1)*30,req.query.page*30);
-					res.render('index', { authenticated: true, currentUser: req.session.user, title: 'Feed', feed: photos, req: req, nextPage: nextPage});
-				}
-			});
-			
-		});
-		}
-		else
-		{
-		req.models.Share.get(entry.ID, function(err, share)
-		{
-			share.getPhoto( function(err, photo) {
-				photo.Timestamp = share.Timestamp;
-				photo.shared = true;
-				photo.extension = photo.Path.split(".")[1];
-				photo.getOwner(function(err, user) {
-					photo.owner_name = user.FullName;
-					photo.timeAgo = time_ago_in_words(new Date(parseInt(photo.Timestamp)))
-					photo.sharer_id = share.sharer_id;
-					share.getSharer(function( err, sharer) {
-						if (err) throw err;
 						count++;
-						photo.sharer_name = sharer.FullName;
+						photo.shared = (shared.length != 0 ? true : false)
 						photos.push(photo);
 						if (count == feed.length)
 						{
@@ -198,8 +160,58 @@ exports.index = function(req, res){
 							}
 							var nextPage = photos.length > req.query.page*30 ? req.query.page+1 : 0;
 							photos = photos.slice((req.query.page-1)*30,req.query.page*30);
-							res.render('index', { authenticated: true, title: 'Feed', currentUser: req.session.user, feed: photos, req: req, nextPage: nextPage});
+							res.render('index', { authenticated: true, currentUser: req.session.user, title: 'Feed', feed: photos, req: req, nextPage: nextPage});
 						}
+					}
+			});
+			
+		});
+		});
+		}
+		else
+		{
+		req.models.Share.get(entry.ID, function(err, share)
+		{
+			share.getPhoto( function(err, photo) {
+				photo.Timestamp = share.Timestamp;
+				photo.extension = photo.Path.split(".")[1];
+				photo.getOwner(function(err, user) {
+					photo.owner_name = user.FullName;
+					photo.timeAgo = time_ago_in_words(new Date(parseInt(photo.Timestamp)))
+					photo.sharer_id = share.sharer_id;
+					share.getSharer(function( err, sharer) {
+						if (err) throw err;
+						photo.sharer_name = sharer.FullName;
+						req.models.Share.find({photo_id: photo.id, sharer_id: req.session.user.id}, function(err, shared)
+						{
+							if (err) throw err;
+							photo.shared = (shared.length != 0 ? true : false)
+							count++;
+							photos.push(photo);
+							if (count == feed.length)
+							{
+								photos.sort(sortPhotos);
+								uniquePhotos = [];
+								photoIDs = [];
+								//remove duplicates
+								for ( var i = 0; i < photos.length; i++)
+								{
+									if (photoIDs.indexOf(photos[i].id) == -1)
+									{
+										photoIDs.push(photos[i].id);
+										uniquePhotos.push(photos[i]);
+									}
+								}
+								photos = uniquePhotos;
+								if (!req.query.page)
+								{
+									req.query.page = 1;
+								}
+								var nextPage = photos.length > req.query.page*30 ? req.query.page+1 : 0;
+								photos = photos.slice((req.query.page-1)*30,req.query.page*30);
+								res.render('index', { authenticated: true, title: 'Feed', currentUser: req.session.user, feed: photos, req: req, nextPage: nextPage});
+							}
+						});
 					});
 				});
 			});
@@ -258,113 +270,71 @@ exports.stream = function(req, res){
 						photo.extension = photo.Path.split(".")[1];
 						photo.getOwner(function(err, owner) {
 							if (err) throw err;
-							photoCount++;
 							photo.owner_name = owner.FullName;
 							photo.timeAgo = time_ago_in_words(new Date(parseInt(photo.Timestamp)))
-							photos.push(photo);
-							if (photoCount == rows.length)
+							req.models.Share.find({photo_id: photo.id, sharer_id: req.session.user.id}, function(err, shared)
 							{
-								req.models.Share.find({sharer_id: id}, function (err, rows) {
-									if (err) throw err;
-									if (rows.length > 0)
+								if (err) throw err;
+								else
+								{
+									photoCount++;
+									photo.shared = (shared.length != 0 ? true : false)
+									photos.push(photo);
+									if (photoCount == rows.length)
 									{
-									rows.forEach( function(share) {
-										share.getPhoto( function(err, photo) {
+										req.models.Share.find({sharer_id: id}, function (err, rows) {
 											if (err) throw err;
-											photo.shared = true;
-											photo.sharer_id = share.sharer_id;
-											photo.Timestamp = share.Timestamp;
-											photo.extension = photo.Path.split(".")[1];
-											photo.getOwner(function(err, owner2) {
-												if (err) throw err;
-												photo.owner_name = owner2.FullName;
-												photo.timeAgo = time_ago_in_words(new Date(parseInt(photo.Timestamp)))
-												share.getSharer(function( err, sharer) {
+											if (rows.length > 0)
+											{
+											rows.forEach( function(share) {
+												share.getPhoto( function(err, photo) {
 													if (err) throw err;
-													shareCount++;
-													photo.sharer_name = sharer.FullName;
-													photos.push(photo);
-													if (shareCount == rows.length)
-													{
-															photos.sort(sortPhotos);
-															uniquePhotos = [];
-															photoIDs = [];
-															//remove duplicates
-															for ( var i = 0; i < photos.length; i++)
-															{
-																if (photoIDs.indexOf(photos[i].id) == -1)
+													photo.sharer_id = share.sharer_id;
+													photo.Timestamp = share.Timestamp;
+													photo.extension = photo.Path.split(".")[1];
+													photo.getOwner(function(err, owner2) {
+														if (err) throw err;
+														photo.owner_name = owner2.FullName;
+														photo.timeAgo = time_ago_in_words(new Date(parseInt(photo.Timestamp)))
+														share.getSharer(function( err, sharer) {
+															if (err) throw err;
+															req.models.Share.find({sharer_id: req.session.user.id, photo_id: photo.id}, function(err, shared) {
+																if (err) throw err;
+																shareCount++;
+																photo.sharer_name = sharer.FullName;
+																photo.shared = (shared.length != 0 ? true : false)
+																photos.push(photo);
+																if (shareCount == rows.length)
 																{
-																	photoIDs.push(photos[i].id);
-																	uniquePhotos.push(photos[i]);
-																}
-															}
-															photos = uniquePhotos;
-															if (!req.query.page)
-															{
-																req.query.page = 1;
-															}
-															var nextPage = photos.length > req.query.page*30 ? req.query.page+1 : 0;
-															photos = photos.slice((req.query.page-1)*30,req.query.page*30);
-															res.render('stream', { authenticated: true, currentUser: req.session.user, title: 'Stream', id: id, user: user, following: following, photos: photos, nextPage: nextPage});
-													}
+																		photos.sort(sortPhotos);
+																		uniquePhotos = [];
+																		photoIDs = [];
+																		//remove duplicates
+																		for ( var i = 0; i < photos.length; i++)
+																		{
+																			if (photoIDs.indexOf(photos[i].id) == -1)
+																			{
+																				photoIDs.push(photos[i].id);
+																				uniquePhotos.push(photos[i]);
+																			}
+																		}
+																		photos = uniquePhotos;
+																		if (!req.query.page)
+																		{
+																			req.query.page = 1;
+																		}
+																		var nextPage = photos.length > req.query.page*30 ? req.query.page+1 : 0;
+																		photos = photos.slice((req.query.page-1)*30,req.query.page*30);
+																		res.render('stream', { authenticated: true, currentUser: req.session.user, title: 'Stream', id: id, user: user, following: following, photos: photos, nextPage: nextPage});
+																	}
+																});
+															});
+														});
+													});
 												});
-											});
-										});
-									});
-									}
-									else
-									{
-										photos.sort(sortPhotos);
-										uniquePhotos = [];
-										photoIDs = [];
-										//remove duplicates
-										for ( var i = 0; i < photos.length; i++)
-										{
-											if (photoIDs.indexOf(photos[i].id) == -1)
-											{
-												photoIDs.push(photos[i].id);
-												uniquePhotos.push(photos[i]);
-											}
-										}
-										photos = uniquePhotos;
-										if (!req.query.page)
-										{
-											req.query.page = 1;
-										}
-										var nextPage = photos.length > req.query.page*30 ? req.query.page+1 : 0;
-										photos = photos.slice((req.query.page-1)*30,req.query.page*30);
-										res.render('stream', { authenticated: true, currentUser: req.session.user, title: 'Stream', id: id, user: user, following: following, photos: photos, nextPage: nextPage});
-									}
-								});
-
-							}
-						});
-					});
-					}
-					else
-					{
-						req.models.Share.find({sharer_id: id}, function (err, rows) {
-							if (err) throw err;
-							if (rows.length > 0)
-							{
-							rows.forEach( function(share) {
-								share.getPhoto( function(err, photo) {
-									if (err) throw err;
-									photo.Timestamp = share.Timestamp;
-									photo.shared = true;
-									photo.sharer_id = share.sharer_id;
-									photo.extension = photo.Path.split(".")[1];
-									photo.getOwner(function(err, owner) {
-										if (err) throw err;
-										photo.owner_name = owner.FullName;
-										photo.timeAgo = time_ago_in_words(new Date(parseInt(photo.Timestamp)))
-										share.getSharer(function( err, sharer) {
-											if (err) throw err;
-											shareCount++;
-											photo.sharer_name = sharer.FullName;
-											photos.push(photo);
-											if (shareCount == rows.length)
-											{
+												}
+												else
+												{
 													photos.sort(sortPhotos);
 													uniquePhotos = [];
 													photoIDs = [];
@@ -385,7 +355,62 @@ exports.stream = function(req, res){
 													var nextPage = photos.length > req.query.page*30 ? req.query.page+1 : 0;
 													photos = photos.slice((req.query.page-1)*30,req.query.page*30);
 													res.render('stream', { authenticated: true, currentUser: req.session.user, title: 'Stream', id: id, user: user, following: following, photos: photos, nextPage: nextPage});
-											}
+												}
+									});
+								}
+							}
+							});
+							});
+							});
+					}
+					else
+					{
+						req.models.Share.find({sharer_id: id}, function (err, rows) {
+							if (err) throw err;
+							if (rows.length > 0)
+							{
+							rows.forEach( function(share) {
+								share.getPhoto( function(err, photo) {
+									if (err) throw err;
+									photo.Timestamp = share.Timestamp;
+									photo.sharer_id = share.sharer_id;
+									photo.extension = photo.Path.split(".")[1];
+									photo.getOwner(function(err, owner) {
+										if (err) throw err;
+										photo.owner_name = owner.FullName;
+										photo.timeAgo = time_ago_in_words(new Date(parseInt(photo.Timestamp)))
+										share.getSharer(function( err, sharer) {
+											if (err) throw err;
+											shareCount++;
+											photo.sharer_name = sharer.FullName;
+											req.models.Share.find({sharer_id: req.session.user.id, photo_id: photo.id}, function(err, sharers) {
+												if (err) throw err;
+												photo.shared = (sharers.length != 0 ? true : false)
+												photos.push(photo);
+												if (shareCount == rows.length)
+												{
+														photos.sort(sortPhotos);
+														uniquePhotos = [];
+														photoIDs = [];
+														//remove duplicates
+														for ( var i = 0; i < photos.length; i++)
+														{
+															if (photoIDs.indexOf(photos[i].id) == -1)
+															{
+																photoIDs.push(photos[i].id);
+																uniquePhotos.push(photos[i]);
+															}
+														}
+														photos = uniquePhotos;
+														if (!req.query.page)
+														{
+															req.query.page = 1;
+														}
+														var nextPage = photos.length > req.query.page*30 ? req.query.page+1 : 0;
+														photos = photos.slice((req.query.page-1)*30,req.query.page*30);
+														res.render('stream', { authenticated: true, currentUser: req.session.user, title: 'Stream', id: id, user: user, following: following, photos: photos, nextPage: nextPage});
+												}
+											});
 										});
 									});
 								});
@@ -518,7 +543,6 @@ req.models.Share.create([
 			if (err) throw err;
 			else
 			{
-			res.redirect('/feed');
 			res.end();
 			}
 	})

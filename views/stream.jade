@@ -2,6 +2,31 @@ extends layout
 
 block content
 
+	script.
+		function loadXMLDoc(elem)
+		{
+			console.log('test');
+			var xmlhttp;
+			if (window.XMLHttpRequest)
+			{// code for IE7+, Firefox, Chrome, Opera, Safari
+				xmlhttp=new XMLHttpRequest();
+			}
+			else
+			{// code for IE6, IE5
+				xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+			}
+			xmlhttp.onreadystatechange=function()
+			{
+				if (xmlhttp.readyState==4 && xmlhttp.status==200)
+				{
+					elem.onclick = undefined;
+					elem.innerHTML="shared";
+				}
+			}
+			xmlhttp.open("GET","/share/" + elem.id,true);
+			xmlhttp.send();
+		}
+
 	h1.title #{user.FullName}'s Stream 
 	- if (currentUser.id != id)
 		if following
@@ -16,9 +41,14 @@ block content
 					img(src='/photos/thumbnail/#{photo.id}.#{photo.extension}' width = 400)
 				br
 				.labelContainer
-					- if (!photo.shared && photo.owner_id != currentUser.id)
-						a.share(href='/share/#{photo.id}') share
-					if photo.shared
+					- if (photo.owner_id != currentUser.id)
+						if photo.shared
+							a.share(href="javascript:void(0);" id='#{photo.id}') shared
+							br
+						else
+							a.share(href="javascript:void(0);" id='#{photo.id}' onclick="loadXMLDoc(this)") share
+							br
+					if photo.sharer_name
 						p
 							span.
 								<a class='nameLabel' href='/users/#{photo.owner_id}'>#{photo.owner_name} </a>
@@ -29,4 +59,4 @@ block content
 					p.timeLabel #{photo.timeAgo)
 		//TODO: Add proper link.
 	if nextPage
-		a.more(href="/users/#{user.id}?page=#{nextPage}") More 
+		a.more(href="/users/#{user.id}?page=#{nextPage}") More
