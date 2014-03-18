@@ -3,7 +3,6 @@
  * GET home page.
  */
 
-
 var time_between_in_words = function(from_date, to_date){
     var result = (to_date - from_date);
     if (result < 0)
@@ -96,7 +95,8 @@ var time_between_in_words = function(from_date, to_date){
     }
 };
 
-var time_ago_in_words = function(date)
+//Unit test function
+exports.time_ago_in_words = function(date)
 {
    return(time_between_in_words(date, new Date()) + " ago");
 };
@@ -130,7 +130,7 @@ exports.index = function(req, res){
 			photo.extension = photo.Path.split(".")[1];
 			photo.getOwner(function(err, user) {
 				photo.owner_name = user.FullName;
-				photo.timeAgo = time_ago_in_words(new Date(parseInt(photo.Timestamp)))
+				photo.timeAgo = exports.time_ago_in_words(new Date(parseInt(photo.Timestamp)))
 				req.models.Share.find({photo_id: photo.id, sharer_id: req.session.user.id}, function(err, shared)
 				{
 					if (err) throw err;
@@ -177,7 +177,7 @@ exports.index = function(req, res){
 				photo.extension = photo.Path.split(".")[1];
 				photo.getOwner(function(err, user) {
 					photo.owner_name = user.FullName;
-					photo.timeAgo = time_ago_in_words(new Date(parseInt(photo.Timestamp)))
+					photo.timeAgo = exports.time_ago_in_words(new Date(parseInt(photo.Timestamp)))
 					photo.sharer_id = share.sharer_id;
 					share.getSharer(function( err, sharer) {
 						if (err) throw err;
@@ -271,7 +271,7 @@ exports.stream = function(req, res){
 						photo.getOwner(function(err, owner) {
 							if (err) throw err;
 							photo.owner_name = owner.FullName;
-							photo.timeAgo = time_ago_in_words(new Date(parseInt(photo.Timestamp)))
+							photo.timeAgo = exports.time_ago_in_words(new Date(parseInt(photo.Timestamp)))
 							req.models.Share.find({photo_id: photo.id, sharer_id: req.session.user.id}, function(err, shared)
 							{
 								if (err) throw err;
@@ -295,7 +295,7 @@ exports.stream = function(req, res){
 													photo.getOwner(function(err, owner2) {
 														if (err) throw err;
 														photo.owner_name = owner2.FullName;
-														photo.timeAgo = time_ago_in_words(new Date(parseInt(photo.Timestamp)))
+														photo.timeAgo = exports.time_ago_in_words(new Date(parseInt(photo.Timestamp)))
 														share.getSharer(function( err, sharer) {
 															if (err) throw err;
 															req.models.Share.find({sharer_id: req.session.user.id, photo_id: photo.id}, function(err, shared) {
@@ -306,19 +306,7 @@ exports.stream = function(req, res){
 																photos.push(photo);
 																if (shareCount == rows.length)
 																{
-																		photos.sort(sortPhotos);
-																		uniquePhotos = [];
-																		photoIDs = [];
-																		//remove duplicates
-																		for ( var i = 0; i < photos.length; i++)
-																		{
-																			if (photoIDs.indexOf(photos[i].id) == -1)
-																			{
-																				photoIDs.push(photos[i].id);
-																				uniquePhotos.push(photos[i]);
-																			}
-																		}
-																		photos = uniquePhotos;
+																		photos = exports.cleanPhotos(photos);
 																		if (!req.query.page)
 																		{
 																			req.query.page = 1;
@@ -335,19 +323,7 @@ exports.stream = function(req, res){
 												}
 												else
 												{
-													photos.sort(sortPhotos);
-													uniquePhotos = [];
-													photoIDs = [];
-													//remove duplicates
-													for ( var i = 0; i < photos.length; i++)
-													{
-														if (photoIDs.indexOf(photos[i].id) == -1)
-														{
-															photoIDs.push(photos[i].id);
-															uniquePhotos.push(photos[i]);
-														}
-													}
-													photos = uniquePhotos;
+													photos = exports.cleanPhotos(photos);
 													if (!req.query.page)
 													{
 														req.query.page = 1;
@@ -363,6 +339,7 @@ exports.stream = function(req, res){
 							});
 							});
 					}
+					//No photos exist, but some shares might
 					else
 					{
 						req.models.Share.find({sharer_id: id}, function (err, rows) {
@@ -378,7 +355,7 @@ exports.stream = function(req, res){
 									photo.getOwner(function(err, owner) {
 										if (err) throw err;
 										photo.owner_name = owner.FullName;
-										photo.timeAgo = time_ago_in_words(new Date(parseInt(photo.Timestamp)))
+										photo.timeAgo = exports.time_ago_in_words(new Date(parseInt(photo.Timestamp)))
 										share.getSharer(function( err, sharer) {
 											if (err) throw err;
 											shareCount++;
@@ -387,21 +364,10 @@ exports.stream = function(req, res){
 												if (err) throw err;
 												photo.shared = (sharers.length != 0 ? true : false)
 												photos.push(photo);
+												//After processing last share render the stream
 												if (shareCount == rows.length)
 												{
-														photos.sort(sortPhotos);
-														uniquePhotos = [];
-														photoIDs = [];
-														//remove duplicates
-														for ( var i = 0; i < photos.length; i++)
-														{
-															if (photoIDs.indexOf(photos[i].id) == -1)
-															{
-																photoIDs.push(photos[i].id);
-																uniquePhotos.push(photos[i]);
-															}
-														}
-														photos = uniquePhotos;
+														photos = exports.cleanPhotos(photos);
 														if (!req.query.page)
 														{
 															req.query.page = 1;
@@ -418,19 +384,7 @@ exports.stream = function(req, res){
 							}
 							else
 							{
-								photos.sort(sortPhotos);
-								uniquePhotos = [];
-								photoIDs = [];
-								//remove duplicates
-								for ( var i = 0; i < photos.length; i++)
-								{
-									if (photoIDs.indexOf(photos[i].id) == -1)
-									{
-										photoIDs.push(photos[i].id);
-										uniquePhotos.push(photos[i]);
-									}
-								}
-								photos = uniquePhotos;
+								photos = exports.cleanPhotos(photos);
 								if (!req.query.page)
 								{
 									req.query.page = 1;
@@ -446,6 +400,24 @@ exports.stream = function(req, res){
          }
      });
 };
+
+//Unit test function
+exports.cleanPhotos = function(photos)
+{
+	photos.sort(sortPhotos);
+	uniquePhotos = [];
+	photoIDs = [];
+	//remove duplicates
+	for ( var i = 0; i < photos.length; i++)
+	{
+		if (photoIDs.indexOf(photos[i].id) == -1)
+		{
+			photoIDs.push(photos[i].id);
+			uniquePhotos.push(photos[i]);
+		}
+	}
+	return uniquePhotos;
+}
 
 exports.follow = function(req, res){
 	// create photo array here
