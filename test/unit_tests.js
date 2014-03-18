@@ -1,8 +1,15 @@
-var login = require("../routes/login")
+var index = require("../routes/index")
 var assert = require("assert")
-describe('login.loginAction', function(){
-    it('should return -1 when the value is not present', function(){
-      assert.equal(-1, login.loginAction(10));
+describe('index.cleanPhotos', function(){
+    it('should return [] when the photo list is empty', function(){
+      assert.deepEqual([], index.cleanPhotos([]));
   })
 })
 
+photos = [{'ID': 2, 'timestamp': 1000}, {'ID': 5, 'timestamp': 3000}, {'ID': 2, 'timestamp': 3000}]
+
+describe('index.cleanPhotos', function(){
+    it('should return [] when the photo list is empty', function(){
+      assert.equal([{'ID': 2, 'timestamp': 1000}, {'ID': 5, 'timestamp': 3000}], index.cleanPhotos(photos));
+  })
+})
