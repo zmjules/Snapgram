@@ -6,10 +6,10 @@ describe('index.cleanPhotos', function(){
   })
 })
 
-photos = [{'ID': 2, 'timestamp': 1000}, {'ID': 5, 'timestamp': 3000}, {'ID': 2, 'timestamp': 3000}]
+photos = [{'id': 2, 'timestamp': 1000}, {'id': 5, 'timestamp': 3000}, {'id': 2, 'timestamp': 3000}]
 
 describe('index.cleanPhotos', function(){
     it('should return [] when the photo list is empty', function(){
-      assert.equal([{'ID': 2, 'timestamp': 1000}, {'ID': 5, 'timestamp': 3000}], index.cleanPhotos(photos));
+      assert.deepEqual([{'id': 2, 'timestamp': 3000}, {'id': 5, 'timestamp': 3000}], index.cleanPhotos(photos));
   })
 })
