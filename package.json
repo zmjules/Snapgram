@@ -10,6 +10,7 @@
     "jade": "*",
     "orm": "*",
     "imagemagick": "*",
-    "gm": "*"
+    "gm": "*",
+    "mocha": "*"
   }
 }
