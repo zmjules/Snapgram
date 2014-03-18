@@ -79,7 +79,7 @@ exports.uploadAction = function(req, res, errorMessage){
 				items[0].Path = newPath;
 				items[0].save(function (err) {
 					if (err) throw err;
-					res.redirect('/feed');
+					setTimeout(function(){res.redirect('/feed')},500);
 				});
 			}
 		})
