@@ -53,6 +53,95 @@ var testLoggedOut1 = function(){
 });
 }
 
+var testLoggedOut2 = function(){
+
+	var responsePath;
+
+	var options = {
+		host: "localhost",
+		port: 8050,
+		path: "/",
+	}
+	
+	describe('Not logged in and path = /sessions/new', function(){
+		it('should return: StatusCode - 302, Path - /sessions/new', function(done){
+			var request = http.request(options)
+
+		// set up an event listener to handle a response
+		request.on('response', function(response) {
+			responsePath = response.headers['location'];
+
+			// we are expecting utf8 encoded data
+			response.setEncoding('utf8')
+			// set up an event listener to be called when each
+			// chunk of data arrives
+			response.on('data', function(data) {
+			})
+			// set up an event listener to be called when response
+			// is complete
+			response.on('end', function() {
+				assert.equal(302, response.statusCode);
+				assert.deepEqual('/sessions/new', responsePath); // check to ensure path is correct
+				done();
+			});
+		});
+		
+		// set up an event listener to handle any error
+		request.on('error', function(e) {
+			console.log("error");
+		})
+		// complete the request
+		request.end()
+
+	});
+});
+}
+
+
+var testLoggedOut3 = function(){
+
+	var responsePath;
+
+	var options = {
+		host: "localhost",
+		port: 8050,
+		path: "/",
+	}
+	
+	describe('Not logged in and path = /users/new', function(){
+		it('should return: StatusCode - 302, Path - /users/new', function(done){
+			var request = http.request(options)
+
+		// set up an event listener to handle a response
+		request.on('response', function(response) {
+			responsePath = response.headers['location'];
+
+			// we are expecting utf8 encoded data
+			response.setEncoding('utf8')
+			// set up an event listener to be called when each
+			// chunk of data arrives
+			response.on('data', function(data) {
+			})
+			// set up an event listener to be called when response
+			// is complete
+			response.on('end', function() {
+				assert.equal(302, response.statusCode);
+				assert.deepEqual('/users/new', responsePath); // check to ensure path is correct
+				done();
+			});
+		});
+		
+		// set up an event listener to handle any error
+		request.on('error', function(e) {
+			console.log("error");
+		})
+		// complete the request
+		request.end()
+
+	});
+});
+}
+
 var register = function() {
 	// clear database
 
@@ -114,8 +203,8 @@ var testLoggedIn1 = function(){
 		path: "/",
 	}
 	
-	describe('Not logged in and path = /', function(){
-		it('should return: StatusCode - 302, Path - /sessions/new', function(done){
+	describe('Logged in and path = /', function(){
+		it('should return: StatusCode - 200, Path - /feed', function(done){
 			var request = http.request(options)
 
 		// set up an event listener to handle a response
@@ -150,8 +239,10 @@ var testLoggedIn1 = function(){
 
 // RUN TESTS
 testLoggedOut1();
-register();
-testLoggedIn1();
+testLoggedOut2();
+testLoggedOut3();
+//register();
+//testLoggedIn1();
 
 
 
