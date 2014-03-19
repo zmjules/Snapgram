@@ -18,6 +18,7 @@ exports.registerAction = function(req, res){
         res.redirect('/users/new');
     }
     else {
+      var start = new Date().getTime();
 	  req.models.User.find({Username: req.body.username}, function (err, results) {
 		  if (err) throw err;
 		  else if (results.length > 0)
@@ -46,6 +47,10 @@ exports.registerAction = function(req, res){
 		  });
 		  }
 	});
+      var end = new Date().getTime();
+      var db_time = end - start; 
+      console.log("Database access (User table) " + db_time + "ms");
+
   }
 }
 
@@ -57,6 +62,7 @@ exports.loginPage = function(req, res, errorMessage){
 exports.loginAction = function(req, res){
     var crypto = require('crypto');
     password = crypto.createHash('sha256').update(req.body.password).digest('hex');
+    var start = new Date().getTime();
     req.models.User.find({Username: req.body.username}, function(err, rows) {
 	   if (err) throw err;
        if (rows.length != 1 || rows[0].Password != password)
@@ -79,6 +85,9 @@ exports.loginAction = function(req, res){
            res.redirect('/feed');
        }
     });
+    var end = new Date().getTime();
+    var db_time = end - start; 
+    console.log("Database access (User table) " + db_time + "ms");
 }
 
 exports.logoutAction = function(req, res){

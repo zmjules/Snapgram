@@ -11,8 +11,8 @@ exports.load = function(req, res){
 	res.writeHead(200, {
             'Content-Type':('image/' + req.params.ext)
 	})
+	var start = new Date().getTime();
 	req.models.Photo.get(req.params.id, function(err, photo) {
-		var start = new Date().getTime();
 		var image = gm(photo.Path);
 		image.stream(function (err, stdout, stderr)
 		{
@@ -29,8 +29,8 @@ exports.loadThumbnail = function(req, res){
 	res.writeHead(200, {
             'Content-Type':('image/' + req.params.ext)
 	})
+	var start = new Date().getTime();
 	req.models.Photo.get(req.params.id, function(err, photo) {
-		var start = new Date().getTime();
 		if (err) throw err;
 		var image = gm(photo.Path);
 		image.resize(400);
