@@ -7,7 +7,7 @@
 var http = require("http");
 var assert = require("assert")
 
-var testRequest = function(pathIn){
+var testRequest = function(pathIn, testNum){
 
 	var returnCode = 0;
 
@@ -18,9 +18,31 @@ var testRequest = function(pathIn){
 	}
 
 	var request = http.request(options); // make the request
+	var responsePath;
 
 	//listen for response
 	request.on('response', function(response) {
+		returnCode = response.statusCode;
+		
+		switch(testNum)
+		{
+			case 1:
+			describe('not logged in path = /', function(){
+				it('response should be 302', function(){
+					assert.equal(302, returnCode);
+				})
+			})	
+			break;
+			case 2:
+			describe('not logged in and path does not exist', function(){
+				it('response should be 302', function(){
+					assert.equal(302, returnCode);
+				})
+			})	
+			break;
+			default:
+			//
+		}
 
 		response.on('data', function() {
 			// empty... necessary to function
@@ -28,13 +50,7 @@ var testRequest = function(pathIn){
 
 		// when response is done...
 		response.on('end', function(){
-			returnCode = response.statusCode;
-			describe('not logged in path = /', function(){
-				it('response should be 302', function(){
-					assert.equal(300, returnCode);
-				})
-			})	
-			console.log("Response Code: " + returnCode);
+			
 		})
 	})
 
@@ -45,7 +61,11 @@ var testRequest = function(pathIn){
 	request.end();
 }
 
-testRequest('/');
+
+// RUN TESTS
+testRequest('/', 1);
+testRequest('/blah', 2);
+
 
 
 
