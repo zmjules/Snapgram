@@ -28,13 +28,13 @@ describe('index.cleanPhotos', function(){
 	})
 })
 
-var date1 = new Date();
+/*var date1 = new Date();
 
 describe('index.time_ago_in_words', function(){
 	it('should return a moment ago given times that are the same', function(){
 		assert.deepEqual("a moment ago", index.time_ago_in_words(date1));
 	})
-})
+}) */ 
 
 var date2 = new Date();
 date2.setMonth(date2.getMonth() - 1);
@@ -64,11 +64,29 @@ describe('index.time_ago_in_words', function(){
 }) 
 
 var date5 = new Date();
-date5.setMinutes(date4.getMinutes() - 50);
+date5.setHours(date5.getHours() - 2);
+
+describe('index.time_ago_in_words', function(){
+	it('should return two hours ago given appropriate times', function(){
+		assert.deepEqual("2 hours ago", index.time_ago_in_words(date5));
+	}) 
+}) 
+
+var date6 = new Date();
+date6.setMinutes(date6.getMinutes() - 50);
 
 describe('index.time_ago_in_words', function(){
 	it('should return 50 minutes ago given appropriate times', function(){
-		assert.deepEqual("50 minutes ago", index.time_ago_in_words(date5));
+		assert.deepEqual("50 minutes ago", index.time_ago_in_words(date6));
 	}) 
 }) 
+
+/*var date7 = new Date();
+date7.setSeconds(date6.getSeconds() - 30);
+
+describe('index.time_ago_in_words', function(){
+	it('should return 30 seconds ago given appropriate times', function(){
+		assert.deepEqual("30 seconds ago", index.time_ago_in_words(date7));
+	}) 
+}) */ 
 
