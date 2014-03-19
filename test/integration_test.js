@@ -95,9 +95,10 @@ var makeInitialRequest = function()
 		options.path = "/users/create";
 		options.method = "POST";
 		options.headers = {
-							  'Content-Type': 'application/x-www-form-urlencoded',
-							  'Content-Length': post_data.length
-						  }
+							'Content-Type': 'application/x-www-form-urlencoded',
+							'Content-Length': post_data.length
+						 }
+		console.log(options.header);
 		var request = http.request(options)
 	
 		// set up an event listener to handle a response
@@ -106,7 +107,7 @@ var makeInitialRequest = function()
 			response.setEncoding('utf8')
 			// set up an event listener to be called when each
 			// chunk of data arrives
-			response.on('data', function(data) {
+			response.on('data', function() {
 				console.log('in data');
 			})
 			// set up an event listener to be called when response
@@ -118,7 +119,6 @@ var makeInitialRequest = function()
 				assert.equal('/feed', response.headers['location']);
 				assert.equal(302, response.statusCode);
 				done();
-					
 			});
 		});
 		
