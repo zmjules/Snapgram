@@ -12,12 +12,16 @@ exports.load = function(req, res){
             'Content-Type':('image/' + req.params.ext)
 	})
 	req.models.Photo.get(req.params.id, function(err, photo) {
+		var start = new Date().getTime();
 		var image = gm(photo.Path);
 		image.stream(function (err, stdout, stderr)
 		{
 			if (err) throw err;
 			stdout.pipe(res); 
 		});
+		var end = new Date().getTime();
+		var db_time = end - start; 
+		console.log("Database access (Photo table) " + db_time + "ms");
 	});
 }
 
@@ -26,6 +30,7 @@ exports.loadThumbnail = function(req, res){
             'Content-Type':('image/' + req.params.ext)
 	})
 	req.models.Photo.get(req.params.id, function(err, photo) {
+		var start = new Date().getTime();
 		if (err) throw err;
 		var image = gm(photo.Path);
 		image.resize(400);
@@ -34,6 +39,9 @@ exports.loadThumbnail = function(req, res){
 			if (err) throw err;
 			stdout.pipe(res); 
 		});
+		var end = new Date().getTime();
+		var db_time = end - start; 
+		console.log("Database access (Photo table) " + db_time + "ms");
 	});
 }
 
@@ -60,7 +68,7 @@ exports.uploadAction = function(req, res, errorMessage){
     }
     // valid image provided 
     else {
-	
+	  var start = new Date().getTime();
 	  // get field values for db
       var userID = parseInt(req.session.user.id);
       var timestamp = new Date().getTime();
@@ -82,10 +90,10 @@ exports.uploadAction = function(req, res, errorMessage){
 					setTimeout(function(){res.redirect('/feed')},500);
 				});
 			}
+		var end = new Date().getTime();
+	  	var db_time = end - start; 
+	  	console.log("Database access (Photo table) " + db_time + "ms");
 		})
-
-
-
     } 
   }
 }
