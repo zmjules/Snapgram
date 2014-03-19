@@ -83,11 +83,15 @@ exports.uploadAction = function(req, res, errorMessage){
 			else
 			{
 				var newPath = path.normalize(__dirname + "/../photos/" + items[0].id + "." + extension)
-				fs.renameSync(req.files.image.path, newPath);
 				items[0].Path = newPath;
-				items[0].save(function (err) {
+				items[0].save(function (err) 
+				{
 					if (err) throw err;
-					setTimeout(function(){res.redirect('/feed')},500);
+					fs.rename(req.files.image.path, newPath, function(err) 
+					{
+						if (err) throw err;
+						res.redirect('/feed');
+					});
 				});
 			}
 		var end = new Date().getTime();
