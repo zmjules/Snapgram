@@ -106,15 +106,23 @@ var sortPhotos = function(a, b) {
 }
 
 exports.index = function(req, res){
+  var start = new Date().getTime();
   req.models.Feed.find({user_id: req.session.user.id}, function (err, rows) {
 	  if (rows == undefined || rows.length == 0)
 	  {
 		  req.session.user = null;
 		  res.redirect('/sessions/new');
+		  var end = new Date().getTime();
+		  var db_time = end - start; 
+		  console.log("Database access (Feed table) " + db_time + "ms");
+
 	  }
 	  else
 	  {
-		  var feed = rows[0].getFeed()
+	  var feed = rows[0].getFeed()
+	  var end = new Date().getTime();
+	  var db_time = end - start; 
+	  console.log("Database access (Feed table) " + db_time + "ms");
 	  var photos = []
 	  var count = 0;	//Use count to call render after all photos have been added (since it's asynchronous)
 	  if (feed == undefined || feed.length == 0)
@@ -122,6 +130,7 @@ exports.index = function(req, res){
 		res.render('index', { authenticated: true, title: 'Feed', currentUser: req.session.user, feed: photos, req: req});
 	  }
 	  feed.forEach(function(entry) {
+	  	var start2 = new Date().getTime();
 		if (entry.type == 'Photo')
 		{
 		req.models.Photo.get(entry.ID, function(err, photo)
@@ -167,9 +176,13 @@ exports.index = function(req, res){
 			
 		});
 		});
+		  var end2 = new Date().getTime();
+		  var db_time2 = end2 - start2; 
+		  console.log("Database access (Photo table) " + db_time2 + "ms");
 		}
 		else
 		{
+		var start2 = new Date().getTime();
 		req.models.Share.get(entry.ID, function(err, share)
 		{
 			share.getPhoto( function(err, photo) {
@@ -217,10 +230,14 @@ exports.index = function(req, res){
 			});
 			
 		});
+		var end2 = new Date().getTime();
+		var db_time2 = end2 - start2; 
+		console.log("Database access (Share table) " + db_time2 + "ms");
 		}
 	  });
         }
         });
+
 };
 
 // Create array of images.
@@ -229,6 +246,7 @@ exports.stream = function(req, res){
 	var id = req.params.id;
 	var user;
     var following = false;
+    var start = new Date().getTime();
 
 	req.models.User.find({ID: id}, function(err, rows) {
        if (err || rows.length != 1)
@@ -240,11 +258,13 @@ exports.stream = function(req, res){
               error = "Multiple users found with this username (corrupted database)";
            console.log("Error: " + error);
 		   res.status(404).render('404.jade', {title: '404: File Not Found'});
+		   var end = new Date().getTime();
+		   var db_time = end - start; 
+		   console.log("Database access (User table) " + db_time + "ms");
        }
        else
        {
-            user = rows[0]
-
+            user = rows[0];
             req.models.Follow.find({follower_id: req.session.user.id, followee_id: id}, function(err, rows) {
                 if (err) throw err;
                 else if (rows.length == 0)
@@ -261,17 +281,25 @@ exports.stream = function(req, res){
 				//Deal with the asynchronicity (it's a word!)
 				var photoCount = 0;
 				var shareCount = 0;
+				var end = new Date().getTime();
+		   		var db_time = end - start; 
+		   		console.log("Database access (Follow table) " + db_time + "ms");
 				
+				start = new Date().getTime();
 				req.models.Photo.find({owner_id: id}, function (err, rows) {
 					if (err) throw err;
 					if (rows.length > 0)
 					{
+					end = new Date().getTime();
+					db_time = end - start; 
+					console.log("Database access (Photo table) " + db_time + "ms");
 					rows.forEach( function(photo) {
 						photo.extension = photo.Path.split(".")[1];
 						photo.getOwner(function(err, owner) {
 							if (err) throw err;
 							photo.owner_name = owner.FullName;
 							photo.timeAgo = exports.time_ago_in_words(new Date(parseInt(photo.Timestamp)))
+							start = new Date().getTime();
 							req.models.Share.find({photo_id: photo.id, sharer_id: req.session.user.id}, function(err, shared)
 							{
 								if (err) throw err;
@@ -338,10 +366,14 @@ exports.stream = function(req, res){
 							});
 							});
 							});
+					end = new Date().getTime();
+					db_time = end - start; 
+	  				console.log("Database access (Share table) " + db_time + "ms");
 					}
 					//No photos exist, but some shares might
 					else
 					{
+						var start = new Date().getTime();
 						req.models.Share.find({sharer_id: id}, function (err, rows) {
 							if (err) throw err;
 							if (rows.length > 0)
@@ -399,6 +431,9 @@ exports.stream = function(req, res){
            });
          }
      });
+var end = new Date().getTime();
+var db_time = end - start; 
+console.log("Database access (Share table) " + db_time + "ms");
 };
 
 //Unit test function
@@ -432,6 +467,7 @@ exports.follow = function(req, res){
         return;
     }
 	
+	var start = new Date().getTime();
     //Check that the requested user to follow exists
     req.models.User.find({ID: followeeID}, function(err, rows) {
 	 if (err) throw err;
@@ -466,6 +502,9 @@ exports.follow = function(req, res){
                     })
                }
          });
+        var end = new Date().getTime()
+        var db_time = end - start; 
+	  	console.log("Database access (Follow table) " + db_time + "ms");
         }
     });
 };
@@ -483,6 +522,7 @@ if (followerID == followeeID)
     return;
 }
 
+var start = new Date().getTime();
 //Check that the follow relationship exists
 req.models.Follow.find({follower_id: followerID, followee_id: followeeID}, function(err, rows) {
         if (err || rows.length == 0)
@@ -498,6 +538,9 @@ req.models.Follow.find({follower_id: followerID, followee_id: followeeID}, funct
              });
         }
      });
+var end = new Date().getTime();
+var db_time = end - start; 
+console.log("Database access (Follow table) " + db_time + "ms");
 };
 
 exports.share = function(req, res){
@@ -506,6 +549,7 @@ var sharerID = parseInt(req.session.user.id);
 var photoID = req.params.id;
 var timestamp = new Date().getTime();
 
+var start = new Date().getTime();
 req.models.Share.create([
    {
 	   sharer_id: sharerID,
@@ -518,5 +562,7 @@ req.models.Share.create([
 			res.end();
 			}
 	})
-
+var end = new Date().getTime();
+var db_time = end - start; 
+console.log("Database access (Share table) " + db_time + "ms");
 };
