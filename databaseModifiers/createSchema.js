@@ -43,9 +43,9 @@ shareTable = "CREATE TABLE Share (\
 mysql = require('mysql');
 conn = mysql.createConnection({
 							host: 'localhost',
-							user: 's513_bjrougea',
+							user: 's513_b.rougeau',
 							password: '10013253',
-							database: 's513_bjrougea'                              });
+							database: 's513_b.rougeau'                              });
 
 conn.connect();
 
