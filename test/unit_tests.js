@@ -54,6 +54,21 @@ describe('index.time_ago_in_words', function(){
 	}) 
 }) 
 
+var date4 = new Date();
+date4.setMonth(date4.getMonth() - 1);
 
+describe('index.time_ago_in_words', function(){
+	it('should return a month ago given appropriate times', function(){
+		assert.deepEqual("1 month ago", index.time_ago_in_words(date4));
+	}) 
+}) 
 
+var date5 = new Date();
+date5.setMinutes(date4.getMinutes() - 50);
+
+describe('index.time_ago_in_words', function(){
+	it('should return 50 minutes ago given appropriate times', function(){
+		assert.deepEqual("50 minutes ago", index.time_ago_in_words(date5));
+	}) 
+}) 
 
