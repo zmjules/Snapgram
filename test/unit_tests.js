@@ -28,6 +28,31 @@ describe('index.cleanPhotos', function(){
 	})
 })
 
+var date1 = new Date();
+
+describe('index.time_ago_in_words', function(){
+	it('should return a moment ago given times that are the same', function(){
+		assert.deepEqual("a moment ago", index.time_ago_in_words(date1));
+	})
+})
+
+var date2 = new Date();
+date2.setMonth(date2.getMonth() - 1);
+
+describe('index.time_ago_in_words', function(){
+	it('should return a month ago given appropriate times', function(){
+		assert.deepEqual("1 month ago", index.time_ago_in_words(date2));
+	}) 
+})  
+
+var date3 = new Date();
+date3.setFullYear(date3.getFullYear() - 1);
+
+describe('index.time_ago_in_words', function(){
+	it('should return a year ago given appropriate times', function(){
+		assert.deepEqual("1 year ago", index.time_ago_in_words(date3));
+	}) 
+}) 
 
 
 
