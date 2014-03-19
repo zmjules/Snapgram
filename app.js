@@ -16,7 +16,7 @@ var flash = require('connect-flash');
 var app = express();
 app.use(express.bodyParser({keepExtensions: true, uploadDir: './photos'}));
 
-app.use(orm.express("mysql://s513_krdillma:10083537@web2.cpsc.ucalgary.ca/s513_krdillma", {
+app.use(orm.express("mysql://s513_bjrougea:10013253@localhost/s513_bjrougea", {
   define: function (db, models, next) {
 	db.settings.set('instance.cache', false);
     models.User = db.define("User", { 
