@@ -53,8 +53,17 @@ var makeInitialRequest = function()
 	
 	describe('Registering', function(){
 	it('should return 302 and a session cookie', function(done){
+		var post_data = querystring.stringify({
+		  fullName: "Test User",
+		  username: "testUser",
+		  password: "testPass"
+		});
 		options.path = "/users/create";
 		options.method = "POST";
+		options.headers = {
+							  'Content-Type': 'application/x-www-form-urlencoded',
+							  'Content-Length': post_data.length
+						  }
 		var request = http.request(options)
 	
 		// set up an event listener to handle a response
@@ -63,8 +72,9 @@ var makeInitialRequest = function()
 			response.setEncoding('utf8')
 			// set up an event listener to be called when each
 			// chunk of data arrives
-			response.on('data', function() {
+			response.on('data', function(data) {
 				console.log('in data');
+				console.log(data);
 			})
 			// set up an event listener to be called when response
 			// is complete
@@ -81,12 +91,7 @@ var makeInitialRequest = function()
 			console.log("error");
 		})
 		x = Date.now();
-		var data = querystring.stringify({
-		  fullName: "Test User",
-		  username: "testUser",
-		  password: "testPass"
-		});
-		request.write(data);
+		request.write(post_data);
 		// complete the request
 		request.end()
 	});
