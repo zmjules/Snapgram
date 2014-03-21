@@ -57,6 +57,7 @@ app.use(orm.express("mysql://s513_b.rougeau:10013253@localhost/s513_b.rougeau", 
               // add photos to all follower's feeds
               row.getFollower(function (err, follower){
 				if (err) throw err;
+				//Need to queue up function to load and update feed, as otherwise each feed update will overwrite itself in bulk uploading
 				if (app.lock[follower.id] == undefined || app.lock[follower.id].length == 0)
 				{
 					app.lock[follower.id] = [ function() {
