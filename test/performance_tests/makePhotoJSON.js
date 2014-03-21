@@ -1,3 +1,6 @@
+//CREATES A PHOTO JSON OBJECT WHERE EACH USER OWNS {THEIR_USER_ID} PHOTOS
+//Useful for testing how the number of images on a stream/feed page affects
+//response time
 var fs = require('fs')
 var counter = 1;
 
