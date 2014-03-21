@@ -88,10 +88,10 @@ exports.users = function(req, res){
 		var crypto = require('crypto');
 		numberOfUsers = req.body.length
 		numUsersDone = 0
+		var followerDict = {};
 		for (var i = 0; i < req.body.length; i++)
 		{
-			followers = req.body[i].follows
-			userID = req.body[i].id
+			followerDict[req.body[i].id] = req.body[i].follows
 			password = crypto.createHash('sha256').update(req.body[i].password).digest('hex');
 			req.models.User.create([
 			{
@@ -102,7 +102,8 @@ exports.users = function(req, res){
 			}
 			], function (err, items) {
 				if (err) throw err;
-				console.log(req.body[i]);
+				userID = items[0]['id']
+				followers = followerDict[userID]
 				for (var j = 0; j < followers.length; j++)
 				{
 					req.models.Follow.create([
@@ -112,10 +113,10 @@ exports.users = function(req, res){
 					}
 					], function (err, items) {
 						if (err) throw err;
-						if (j == followers.length)
+						if (j == followers.length-1)
 						{
 							numUsersDone++;
-							if (numUsersDone == numberOfUsers)
+							if (numUsersDone == numberOfUsers-1)
 							{
 								res.writeHead(200, {'Content-Type': 'text/plain'});
 								res.end('Added users');
@@ -123,7 +124,21 @@ exports.users = function(req, res){
 						}
 					});
 				}
+				if (followers.length == 0)
+				{
+					numUsersDone++;
+					if (numUsersDone == numberOfUsers)
+					{
+						res.writeHead(200, {'Content-Type': 'text/plain'});
+						res.end('Added users');
+					}
+				}
 			});
+		}
+		if (req.body.length == 0)
+		{
+			res.writeHead(200, {'Content-Type': 'text/plain'});
+			res.end('Added users');
 		}
 	}
 	else
@@ -133,32 +148,37 @@ exports.users = function(req, res){
 	}
 };
 
-var loadPhotosIndividually = function(req, photos, res, i)
-{
-	req.models.Photo.create([
+exports.photos = function(req, res){
+	if (req.query.password == "zorodi")
 	{
-		id: photos[i].id,
-		owner_id: photos[i].user_id,
-		Path: photos[i].path,
-		Timestamp: photos[i].timestamp
-	}
-	], function (err, items) {
-		if (err) throw err;
-		if (i+1 < photos.length)
-			loadPhotosIndividually(req, photos, res, i+1);
-		else
+		var loadedPhotos = 0;
+		var photos = req.body
+		
+		for (var i = 0; i < photos.length; i++)
+		{
+			req.models.Photo.create([
+			{
+				id: photos[i].id,
+				owner_id: photos[i].user_id,
+				Path: photos[i].path,
+				Timestamp: photos[i].timestamp
+			}
+			], function (err, items) {
+				console.log('0');
+				loadedPhotos++
+				if (err) throw err;
+				if (loadedPhotos == photos.length)
+				{
+					res.writeHead(200, {'Content-Type': 'text/plain'});
+					res.end('Added photos');
+				}
+			});
+		}
+		if (photos.length == 0)
 		{
 			res.writeHead(200, {'Content-Type': 'text/plain'});
 			res.end('Added photos');
 		}
-	});
-}
-
-exports.photos = function(req, res){
-	if (req.query.password == "zorodi")
-	{
-		var crypto = require('crypto');
-		loadPhotosIndividually(req, req.body, res, 0);
 	}
 	else
 	{
