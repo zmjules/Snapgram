@@ -15,10 +15,10 @@ var flash = require('connect-flash');
 
 var app = express();
 app.use(express.bodyParser({keepExtensions: true, uploadDir: './photos'}));
+app.lock = {}
 
 app.use(orm.express("mysql://s513_b.rougeau:10013253@localhost/s513_b.rougeau", {
   define: function (db, models, next) {
-	db.settings.set('instance.cache', false);
     models.User = db.define("User", { 
         FullName : String,
         Username : String,
@@ -57,10 +57,25 @@ app.use(orm.express("mysql://s513_b.rougeau:10013253@localhost/s513_b.rougeau", 
               // add photos to all follower's feeds
               row.getFollower(function (err, follower){
 				if (err) throw err;
-                follower.getFeed(function (err, feed){
-					if (err) throw err;
-				  	feed[0].addToFeed(photo_id, "Photo");
-                })
+				if (app.lock[follower.id] == undefined || app.lock[follower.id].length == 0)
+				{
+					app.lock[follower.id] = [ function() {
+						follower.getFeed(function (err, feed){
+							if (err) throw err;
+							feed[0].addToFeed(photo_id, "Photo");
+						});
+					} ];
+					app.lock[follower.id][0]();
+				}
+				else
+				{
+					app.lock[follower.id].push(function() {
+						follower.getFeed(function (err, feed){
+							if (err) throw err;
+						});
+					});
+				}
+                
 				})
             })
         });
@@ -78,13 +93,24 @@ app.use(orm.express("mysql://s513_b.rougeau:10013253@localhost/s513_b.rougeau", 
             addToFeed: function (itemID, type) {
 				currentList = JSON.parse(this.FeedList)
 				currentList.push({'ID': itemID, 'type': type});
-                this.FeedList = JSON.stringify(currentList);
-                this.save();
+				this.FeedList = JSON.stringify(currentList);
+				this.save();
             },
             getFeed: function () {
                 return JSON.parse(this.FeedList);
             }
-    }
+    }, hooks: {
+		afterSave: function () {
+			if (app.lock[this.user_id] != undefined)
+			{
+				app.lock[this.user_id].shift();
+				if ( app.lock[this.user_id].length )
+				{
+					app.lock[this.user_id][0]();
+				}
+			}
+		}
+	}
     });
 	models.Share = db.define("Share", {
         Timestamp: Date
