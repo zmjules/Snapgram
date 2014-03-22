@@ -17,7 +17,7 @@ var app = express();
 app.use(express.bodyParser({keepExtensions: true, uploadDir: './photos'}));
 app.lock = {}
 
-app.use(orm.express("mysql://s513_b.rougeau:10013253@localhost/s513_b.rougeau", {
+app.use(orm.express("mysql://s513_krdillma:10083537@web2.cpsc.ucalgary.ca/s513_krdillma", {
   define: function (db, models, next) {
     models.User = db.define("User", { 
         FullName : String,
