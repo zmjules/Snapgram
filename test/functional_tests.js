@@ -19,7 +19,7 @@ var testLoggedOut1 = function(){
 
 	var options = {
 		host: "localhost",
-		port: 8050,
+		port: 8053,
 		path: "/",
 	}
 	
@@ -65,7 +65,7 @@ var testLoggedOut2 = function(){
 
 	var options = {
 		host: "localhost",
-		port: 8050,
+		port: 8053,
 		path: "/sessions/new",
 	}
 	
@@ -110,7 +110,7 @@ var testLoggedOut3 = function(){
 
 	var options = {
 		host: "localhost",
-		port: 8050,
+		port: 8053,
 		path: "/users/new",
 	}
 	
@@ -155,7 +155,7 @@ var testLoggedOut4 = function(){
 
 	var options = {
 		host: "localhost",
-		port: 8050,
+		port: 8053,
 		path: "/feed",
 	}
 	
@@ -201,7 +201,7 @@ var testLoggedOut5 = function(){
 
 	var options = {
 		host: "localhost",
-		port: 8050,
+		port: 8053,
 		path: "/photos/new",
 	}
 	
@@ -247,7 +247,7 @@ var testLoggedOut6 = function(){
 
 	var options = {
 		host: "localhost",
-		port: 8050,
+		port: 8053,
 		path: "/users/1",
 	}
 	
@@ -293,7 +293,7 @@ var testLoggedOut7 = function(){
 
 	var options = {
 		host: "localhost",
-		port: 8050,
+		port: 8053,
 		path: "/invalidPath",
 	}
 	
@@ -337,7 +337,7 @@ var register = function() {
 	// clear database
 	var options = {
 		host: "localhost",
-		port: 8050,
+		port: 8053,
 		path: "/bulk/clear?password=zorodi",
 		method: 'GET'
 	}
@@ -463,7 +463,7 @@ var testLoggedIn1 = function(){
 
 	var options = {
 		host: "localhost",
-		port: 8050,
+		port: 8053,
 		path: "/feed",
 		method: 'GET',
 	}
@@ -513,7 +513,7 @@ var testLoggedIn2 = function(){
 
 	var options = {
 		host: "localhost",
-		port: 8050,
+		port: 8053,
 		path: "/invalidPath",
 		method: 'GET',
 	}
@@ -563,7 +563,7 @@ var testLoggedIn3 = function(){
 
 	var options = {
 		host: "localhost",
-		port: 8050,
+		port: 8053,
 		path: "/photos/new",
 		method: 'GET',
 	}
@@ -614,7 +614,7 @@ var testLoggedIn4 = function(){
 
 	var options = {
 		host: "localhost",
-		port: 8050,
+		port: 8053,
 		path: "/sessions/new",
 		method: 'GET',
 	}
@@ -664,7 +664,7 @@ var testLoggedIn5 = function(){
 
 	var options = {
 		host: "localhost",
-		port: 8050,
+		port: 8053,
 		path: "/users/new",
 		method: 'GET',
 	}

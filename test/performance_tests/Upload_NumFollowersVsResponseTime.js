@@ -10,7 +10,7 @@ var uploadPhoto = function(numFollowers, data)
 {
 	var options = {
 		host: "localhost",
-		port: 8050,
+		port: 8053,
 		path: "/photos/create",
 		method: 'POST'
 	}
@@ -51,7 +51,7 @@ var login = function(numFollowers, userInfo, data)
 {
 	var options = {
 		host: "localhost",
-		port: 8050,
+		port: 8053,
 		path: "/sessions/create",
 		method: 'POST'
 	}
@@ -113,7 +113,7 @@ var createUsers = function()
 	
 		var options = {
 		   host: 'localhost',
-		   port: 8050,
+		   port: 8053,
 		   path: '/bulk/users?password=zorodi',
 		   method: 'POST',
 		   headers: {
@@ -139,7 +139,7 @@ var clearDatabase = function()
 {
 	var options = {
 		host: "localhost",
-		port: 8050,
+		port: 8053,
 		path: "/bulk/clear?password=zorodi",
 		method: 'GET'
 	}

@@ -1,20 +1,26 @@
 var http = require('http')
 var querystring = require('querystring')
 var path = require('path')
+var FormData = require('form-data')
+var fs = require('fs')
 
 var sessionID = ''
 var requestsCompleted = 0;
 var startTime;
 
-var createRequest = function(requestNum, totalRequests)
+var uploadPhoto = function(requestNum, totalRequests)
 {
 	var options = {
 		host: "localhost",
 		port: 8053,
-		path: "/feed",
-		method: 'GET',
-		headers: {'Cookie': 'sid=' + sessionID}
+		path: "/photos/create",
+		method: 'POST'
 	}
+
+	var form = new FormData();
+	form.append("image", fs.createReadStream(path.normalize(__dirname + "/../image.png")));
+	options.headers = form.getHeaders()
+	options.headers['Cookie'] = 'sid=' + sessionID
 	var request = http.request(options)
 
 	// set up an event listener to handle a response
@@ -28,23 +34,14 @@ var createRequest = function(requestNum, totalRequests)
 		// set up an event listener to be called when response
 		// is complete
 		response.on('end', function() {
-			requestsCompleted++;
-			if (requestsCompleted == totalRequests)
-			{
-				console.log(totalRequests + ',' + (new Date() - startTime));
-				if (totalRequests < 100)
-					createRequests(totalRequests+1);
-			}
-				
-		});
+			console.log(' Response Time: ' + (new Date() - startTime));
 	});
 	
 	// set up an event listener to handle any error
 	request.on('error', function(e) {
 		console.log("error");
 	});
-	// complete the request
-	request.end()
+	form.pipe(request);
 }
 
 var createRequests = function(totalRequests)
@@ -53,7 +50,7 @@ var createRequests = function(totalRequests)
 	startTime = new Date();
 	for (var i = 0; i < totalRequests; i++)
 	{
-		createRequest(i, totalRequests)
+		uploadPhoto(i, totalRequests)
 	}
 }
 
@@ -66,8 +63,8 @@ var login = function()
 		method: 'POST'
 	}
 	var post_data = querystring.stringify({
-	  username: "john",
-	  password: "5678"
+	  username: 'john',
+	  password: '5678'
 	});
 	options.method = "POST";
 	options.headers = {
@@ -104,34 +101,6 @@ var login = function()
 	request.end()
 }
 
-var createPhotos = function()
-{
-	var jsonPhotos = JSON.stringify([{id: 20, user_id: 1, path: path.normalize(__dirname + './image.png'), timestamp: 1234}, {id: 21, user_id: 1, path: path.normalize(__dirname + './image.png'), timestamp: 5678}, {id: 22, user_id: 1, path: path.normalize(__dirname + './image.png'), timestamp: 1234}, {id: 23, user_id: 1, path: path.normalize(__dirname + './image.png'), timestamp: 1234}, {id: 24, user_id: 1, path: path.normalize(__dirname + './image.png')}]);
-	
-	var options = {
-	   host: 'localhost',
-	   port: 8053,
-	   path: '/bulk/photos?password=zorodi',
-	   method: 'POST',
-	   headers: {
-			'Content-Type': "application/json; charset=utf-8",
-			'Content-Length': Buffer.byteLength(jsonPhotos)
-		}
-	}
-	var request = http.request(options);
-	request.on('response', function(response) {
-		response.on('data', function(data) {
-		})
-		response.on('end', function(chunk) {
-			login();
-		});
-	 });
-	 request.write(jsonPhotos);
-
-	 // complete the request
-	 request.end()
-}
-
 var createUsers = function()
 {
 	var jsonUsers = JSON.stringify([{'id': 1, 'name': 'john', follows: [], password: '5678'}]);
@@ -151,7 +120,7 @@ var createUsers = function()
 		response.on('data', function(data) {
 		})
 		response.on('end', function(chunk) {
-			createPhotos();
+			login();
 		});
 	 });
 	 request.write(jsonUsers);
