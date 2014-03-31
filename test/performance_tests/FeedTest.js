@@ -1,11 +1,19 @@
 var http = require('http')
 var querystring = require('querystring')
+<<<<<<< HEAD
 var path = require('path')
+=======
+var fs = require("fs");
+>>>>>>> FeedTest Starting to Work
 
 var sessionID = ''
 var photosLoaded = {};
 var startTime;
+var num = 1;
+var numOut = 0;	// track number of requests sent
+var numBack = 0; // track number of requests returned
 
+<<<<<<< HEAD
 var requestPhoto = function(photoPath, requestNum, totalRequests, numPhotos)
 {
 	var options = {
@@ -46,6 +54,14 @@ var requestPhoto = function(photoPath, requestNum, totalRequests, numPhotos)
 var createRequest = function(requestNum, totalRequests)
 {
 	fullData = '';
+=======
+var createRequest = function(requestNum, totalRequests, timeOut)
+{
+
+	var localNum = num;
+	console.log('sending request #: ' + localNum);
+
+>>>>>>> FeedTest Starting to Work
 	var options = {
 		host: "localhost",
 		port: 8053,
@@ -67,6 +83,7 @@ var createRequest = function(requestNum, totalRequests)
 		// set up an event listener to be called when response
 		// is complete
 		response.on('end', function() {
+<<<<<<< HEAD
 			var splitData = fullData.split('<img src="')
 			var counter = 0;
 			photosLoaded[requestNum] = 0;
@@ -76,6 +93,26 @@ var createRequest = function(requestNum, totalRequests)
 				console.log(counter);
 				counter++;
 			}	
+=======
+
+			numBack++; // keep track of number of requests back in
+
+			// calculate time
+			var timeRec = new Date();
+			var timeDiff = timeRec.valueOf() - timeOut.valueOf();
+
+			console.log('Num: ' + localNum + " took " + timeDiff);
+
+			requestsCompleted++;
+			if (requestsCompleted == totalRequests)
+			{
+				console.log('Total Time: ' + (new Date() - startTime));
+				if (totalRequests < 50){
+					createRequests(totalRequests+1);
+				}
+			}
+				
+>>>>>>> FeedTest Starting to Work
 		});
 	});
 	
@@ -91,9 +128,12 @@ var createRequests = function(totalRequests)
 {
 	requestsCompleted = 0;
 	startTime = new Date();
+
 	for (var i = 0; i < totalRequests; i++)
 	{
-		createRequest(i, totalRequests)
+		var timeOut = new Date();
+		createRequest(i, totalRequests, timeOut);
+		num++;
 	}
 
 }
@@ -107,8 +147,8 @@ var login = function()
 		method: 'POST'
 	}
 	var post_data = querystring.stringify({
-	  username: "john",
-	  password: "5678"
+	  username: "octavia.overbay",
+	  password: "Octavia"
 	});
 	options.method = "POST";
 	options.headers = {
@@ -130,7 +170,7 @@ var login = function()
 		response.on('end', function() {
 			//Ugly code to get session cookie
 			sessionID = response.headers['set-cookie'][0].split('sid=')[1].split(';')[0];
-			createRequests(1);
+			createRequests(50);
 			//and the user ID
 			/**firstUserID = response.headers['set-cookie'][0].split('id%22%3A')[1].split('%7D%7D')[0];*/
 		});
@@ -147,6 +187,7 @@ var login = function()
 
 var createPhotos = function()
 {
+<<<<<<< HEAD
 	var jsonPhotos = JSON.stringify([{id: 20, user_id: 1, path: path.normalize(__dirname + '/../image.png'), timestamp: 1234}, 
 		{id: 21, user_id: 1, path: path.normalize(__dirname + '/../image.png'), timestamp: 5678}, 
 		{id: 22, user_id: 1, path: path.normalize(__dirname + '/../image.png'), timestamp: 1234}, 
@@ -254,11 +295,39 @@ var createUsers = function()
 		response.on('end', function(chunk) {
 			createPhotos();
 		});
-	 });
-	 request.write(jsonUsers);
+=======
+	fs.readFile('users.json', 'utf8', function (err, data) {
+	  if (err) {
+		console.log('Error: ' + err);
+		return;
+	  }
+	 
+	  data = JSON.parse(data);
+	  jsonUsers = JSON.stringify(data);
+	
+		var options = {
+		   host: 'localhost',
+		   port: 8053,
+		   path: '/bulk/users?password=zorodi',
+		   method: 'POST',
+		   headers: {
+				'Content-Type': "application/json; charset=utf-8",
+				'Content-Length': Buffer.byteLength(jsonUsers)
+			}
+		}
+		var request = http.request(options);
+		request.on('response', function(response) {
+			response.on('data', function(data) {
+			})
+			response.on('end', function(chunk) {
+				login();
+			});
+		 });
 
-	 // complete the request
-	 request.end()
+		 // complete the request
+		 request.end(jsonUsers);
+>>>>>>> FeedTest Starting to Work
+	 });
 }
 
 var clearDatabase = function()
