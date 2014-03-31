@@ -105,6 +105,8 @@ var sortPhotos = function(a, b) {
 	return ( (parseInt(a.Timestamp) > parseInt(b.Timestamp)) ? -1 : 1);
 }
 
+// This is the FEED.
+
 exports.index = function(req, res){
   var start = new Date().getTime();
   req.models.Feed.find({user_id: req.session.user.id}, function (err, rows) {
@@ -119,7 +121,7 @@ exports.index = function(req, res){
 	  }
 	  else
 	  {
-	  var feed = rows[0].getFeed()
+	  var feed = rows[0].getFeed() // feed for current user
 	  var end = new Date().getTime();
 	  var db_time = end - start; 
 	  console.log("Database access (Feed table) " + db_time + "ms");
