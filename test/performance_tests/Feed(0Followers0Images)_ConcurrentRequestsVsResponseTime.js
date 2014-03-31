@@ -9,7 +9,7 @@ var createRequest = function(requestNum, totalRequests)
 {
 	var options = {
 		host: "localhost",
-		port: 8053,
+		port: 8050,
 		path: "/feed",
 		method: 'GET',
 		headers: {'Cookie': 'sid=' + sessionID}
@@ -60,7 +60,7 @@ var register = function()
 {
 	var options = {
 		host: "localhost",
-		port: 8053,
+		port: 8050,
 		path: "/users/create",
 		method: 'POST'
 	}
@@ -108,7 +108,7 @@ var clearDatabase = function()
 {
 	var options = {
 		host: "localhost",
-		port: 8053,
+		port: 8050,
 		path: "/bulk/clear?password=zorodi",
 		method: 'GET'
 	}

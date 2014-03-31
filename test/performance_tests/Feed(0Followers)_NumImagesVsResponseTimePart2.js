@@ -14,7 +14,7 @@ var loadFeed = function(numPhotos, data)
 	fullData = '';
 	var options = {
 		host: "localhost",
-		port: 8053,
+		port: 8050,
 		path: "/feed",
 		method: 'GET',
 		headers: {'Cookie': 'sid=' + sessionID}
@@ -50,7 +50,7 @@ var login = function(numPhotos, userInfo, data)
 {
 	var options = {
 		host: "localhost",
-		port: 8053,
+		port: 8050,
 		path: "/sessions/create",
 		method: 'POST'
 	}

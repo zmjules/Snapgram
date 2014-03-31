@@ -17,7 +17,7 @@ var createPhotos = function(userData)
 	
 		var options = {
 		   host: 'localhost',
-		   port: 8053,
+		   port: 8050,
 		   path: '/bulk/photos?password=zorodi',
 		   method: 'POST',
 		   headers: {
@@ -52,7 +52,7 @@ var createUsers = function()
 	
 		var options = {
 		   host: 'localhost',
-		   port: 8053,
+		   port: 8050,
 		   path: '/bulk/users?password=zorodi',
 		   method: 'POST',
 		   headers: {
@@ -78,7 +78,7 @@ var clearDatabase = function()
 {
 	var options = {
 		host: "localhost",
-		port: 8053,
+		port: 8050,
 		path: "/bulk/clear?password=zorodi",
 		method: 'GET'
 	}

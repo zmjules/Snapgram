@@ -150,7 +150,7 @@ app.use(orm.express("mysql://s513_krdillma:10083537@localhost/s513_krdillma", {
                   
                   
 // all environments
-app.set('port', process.env.PORT || 8053);
+app.set('port', process.env.PORT || 8050);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.use(express.favicon());

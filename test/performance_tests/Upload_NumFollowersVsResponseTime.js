@@ -10,7 +10,7 @@ var uploadPhoto = function(numFollowers, data)
 {
 	var options = {
 		host: "localhost",
-		port: 8053,
+		port: 8050,
 		path: "/photos/create",
 		method: 'POST'
 	}
@@ -51,7 +51,7 @@ var login = function(numFollowers, userInfo, data)
 {
 	var options = {
 		host: "localhost",
-		port: 8053,
+		port: 8050,
 		path: "/sessions/create",
 		method: 'POST'
 	}
@@ -113,7 +113,7 @@ var createUsers = function()
 	
 		var options = {
 		   host: 'localhost',
-		   port: 8053,
+		   port: 8050,
 		   path: '/bulk/users?password=zorodi',
 		   method: 'POST',
 		   headers: {
@@ -127,7 +127,6 @@ var createUsers = function()
 			})
 			response.on('end', function(chunk) {
 				makeRequest(0, data);
-				console.log('here');
 			});
 		 });
 
@@ -140,7 +139,7 @@ var clearDatabase = function()
 {
 	var options = {
 		host: "localhost",
-		port: 8053,
+		port: 8050,
 		path: "/bulk/clear?password=zorodi",
 		method: 'GET'
 	}
