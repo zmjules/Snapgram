@@ -1,12 +1,14 @@
-var FormData = require("form-data");
-var http = require("http");
-var path = require("path");
-var fs = require("fs");
-var querystring = require("querystring");
-var sessionID = ''
-var startTime = 0
+var http = require('http')
+var querystring = require('querystring')
+var path = require('path')
+var FormData = require('form-data')
+var fs = require('fs')
 
-var uploadPhoto = function(numFollowers, data)
+var sessionID = ''
+var requestsCompleted = 0;
+var startTime;
+
+var uploadPhoto = function(requestNum, totalRequests)
 {
 	var options = {
 		host: "localhost",
@@ -32,12 +34,7 @@ var uploadPhoto = function(numFollowers, data)
 		// set up an event listener to be called when response
 		// is complete
 		response.on('end', function() {
-			console.log(numFollowers + ',' + (new Date() - startTime))
-			if (numFollowers < 99)
-			{
-				makeRequest(numFollowers+1, data)
-			}
-		});
+			console.log(' Response Time: ' + (new Date() - startTime));
 	});
 	
 	// set up an event listener to handle any error
@@ -47,7 +44,17 @@ var uploadPhoto = function(numFollowers, data)
 	form.pipe(request);
 }
 
-var login = function(numFollowers, userInfo, data)
+var createRequests = function(totalRequests)
+{
+	requestsCompleted = 0;
+	startTime = new Date();
+	for (var i = 0; i < totalRequests; i++)
+	{
+		uploadPhoto(i, totalRequests)
+	}
+}
+
+var login = function()
 {
 	var options = {
 		host: "localhost",
@@ -56,8 +63,8 @@ var login = function(numFollowers, userInfo, data)
 		method: 'POST'
 	}
 	var post_data = querystring.stringify({
-	  username: userInfo['name'],
-	  password: userInfo['password']
+	  username: 'john',
+	  password: '5678'
 	});
 	options.method = "POST";
 	options.headers = {
@@ -78,9 +85,8 @@ var login = function(numFollowers, userInfo, data)
 		// is complete
 		response.on('end', function() {
 			//Ugly code to get session cookie
-			startTime = new Date();
 			sessionID = response.headers['set-cookie'][0].split('sid=')[1].split(';')[0];
-			uploadPhoto(numFollowers, data);
+			createRequests(1);
 			//and the user ID
 			/**firstUserID = response.headers['set-cookie'][0].split('id%22%3A')[1].split('%7D%7D')[0];*/
 		});
@@ -95,45 +101,32 @@ var login = function(numFollowers, userInfo, data)
 	request.end()
 }
 
-var makeRequest = function(numFollowers, data)
-{
-	login(numFollowers, data[numFollowers], data);
-}
-
 var createUsers = function()
 {
-	fs.readFile('users.json', 'utf8', function (err, data) {
-	  if (err) {
-		console.log('Error: ' + err);
-		return;
-	  }
-	 
-	  data = JSON.parse(data);
-	  jsonUsers = JSON.stringify(data);
+	var jsonUsers = JSON.stringify([{'id': 1, 'name': 'john', follows: [], password: '5678'}]);
 	
-		var options = {
-		   host: 'localhost',
-		   port: 8053,
-		   path: '/bulk/users?password=zorodi',
-		   method: 'POST',
-		   headers: {
-				'Content-Type': "application/json; charset=utf-8",
-				'Content-Length': Buffer.byteLength(jsonUsers)
-			}
+	var options = {
+	   host: 'localhost',
+	   port: 8053,
+	   path: '/bulk/users?password=zorodi',
+	   method: 'POST',
+	   headers: {
+			'Content-Type': "application/json; charset=utf-8",
+			'Content-Length': Buffer.byteLength(jsonUsers)
 		}
-		var request = http.request(options);
-		request.on('response', function(response) {
-			response.on('data', function(data) {
-			})
-			response.on('end', function(chunk) {
-				makeRequest(0, data);
-				console.log('here');
-			});
-		 });
-
-		 // complete the request
-		 request.end(jsonUsers);
+	}
+	var request = http.request(options);
+	request.on('response', function(response) {
+		response.on('data', function(data) {
+		})
+		response.on('end', function(chunk) {
+			login();
+		});
 	 });
+	 request.write(jsonUsers);
+
+	 // complete the request
+	 request.end()
 }
 
 var clearDatabase = function()

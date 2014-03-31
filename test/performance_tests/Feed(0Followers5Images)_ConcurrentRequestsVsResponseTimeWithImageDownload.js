@@ -11,7 +11,7 @@ var requestPhoto = function(photoPath, requestNum, totalRequests, numPhotos)
 {
 	var options = {
 		host: "localhost",
-		port: 8050,
+		port: 8053,
 		path: photoPath,
 		method: 'GET',
 		headers: {'Cookie': 'sid=' + sessionID}
@@ -58,7 +58,7 @@ var createRequest = function(requestNum, totalRequests)
 	fullData = '';
 	var options = {
 		host: "localhost",
-		port: 8050,
+		port: 8053,
 		path: "/feed",
 		method: 'GET',
 		headers: {'Cookie': 'sid=' + sessionID}
@@ -109,7 +109,7 @@ var login = function()
 {
 	var options = {
 		host: "localhost",
-		port: 8050,
+		port: 8053,
 		path: "/sessions/create",
 		method: 'POST'
 	}
@@ -158,7 +158,7 @@ var createPhotos = function()
 	
 	var options = {
 	   host: 'localhost',
-	   port: 8050,
+	   port: 8053,
 	   path: '/bulk/photos?password=zorodi',
 	   method: 'POST',
 	   headers: {
@@ -186,7 +186,7 @@ var createUsers = function()
 	
 	var options = {
 	   host: 'localhost',
-	   port: 8050,
+	   port: 8053,
 	   path: '/bulk/users?password=zorodi',
 	   method: 'POST',
 	   headers: {
@@ -212,7 +212,7 @@ var clearDatabase = function()
 {
 	var options = {
 		host: "localhost",
-		port: 8050,
+		port: 8053,
 		path: "/bulk/clear?password=zorodi",
 		method: 'GET'
 	}
