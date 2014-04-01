@@ -4,7 +4,7 @@
  */
 mysql = require('mysql');
 conn = mysql.createConnection({
-                              host: 'localhost',
+                              host: 'web2.cpsc.ucalgary.ca',
                               user: 'root',
                               password: ''
                               });

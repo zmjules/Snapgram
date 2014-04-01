@@ -107,9 +107,6 @@ var sortPhotos = function(a, b) {
 
 exports.index = function(req, res){
   var start = new Date().getTime();
-
-  // QUESTION: check in here to see if feed for user is cached?
-
   req.models.Feed.find({user_id: req.session.user.id}, function (err, rows) {
 	  if (rows == undefined || rows.length == 0)
 	  {
@@ -122,7 +119,7 @@ exports.index = function(req, res){
 	  }
 	  else
 	  {
-	  var feed = rows[0].getFeed() // QUESTION: provide cached feed here?
+	  var feed = rows[0].getFeed()
 	  var end = new Date().getTime();
 	  var db_time = end - start; 
 	  console.log("Database access (Feed table) " + db_time + "ms");
