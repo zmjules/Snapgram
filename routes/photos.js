@@ -32,13 +32,7 @@ exports.loadThumbnail = function(req, res){
 	var start = new Date().getTime();
 	req.models.Photo.get(req.params.id, function(err, photo) {
 		if (err) throw err;
-		var image = gm(photo.Path);
-		image.resize(400);
-		image.stream(function (err, stdout, stderr)
-		{
-			if (err) throw err;
-			stdout.pipe(res); 
-		});
+		gm(photo.Path).resize(400).stream().pipe(res);
 		var end = new Date().getTime();
 		var db_time = end - start; 
 		console.log("Database access (Photo table) " + db_time + "ms");
@@ -83,12 +77,14 @@ exports.uploadAction = function(req, res, errorMessage){
 			else
 			{
 				var newPath = path.normalize(__dirname + "/../photos/" + items[0].id + "." + extension)
+				var thumbPath = path.normalize(__dirname + "/../photos/thumbnail/" + items[0].id + "." + extension)
 				items[0].Path = newPath;
 				items[0].save(function (err) 
 				{
 					if (err) throw err;
 					fs.rename(req.files.image.path, newPath, function(err) 
 					{
+						gm(newPath).resize(400).write(thumbPath, function(err) {console.log(err)});
 						if (err) throw err;
 						res.redirect('/feed');
 					});

@@ -17,7 +17,7 @@ var app = express();
 app.use(express.bodyParser({keepExtensions: true, uploadDir: './photos'}));
 app.lock = {}
 
-app.use(orm.express("mysql://s513_krdillma:10083537@web2.cpsc.ucalgary.ca/s513_krdillma", {
+app.use(orm.express("mysql://s513_bjrougea:10013253@web2.cpsc.ucalgary.ca/s513_bjrougea", {
   define: function (db, models, next) {
     models.User = db.define("User", { 
         FullName : String,
@@ -159,6 +159,7 @@ app.use(express.json());
 app.use(express.urlencoded());
 app.use(express.methodOverride());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/photos', express.static(path.join(__dirname, 'photos')));
 app.use(express.cookieParser());
 app.use(express.cookieSession({'key': 'sid', 'secret': 'someSecret'}));
 app.use(flash());
@@ -215,8 +216,6 @@ app.get('/users/:id/unfollow', routes.unfollow);
 app.get('/share/:id', routes.share);
 app.get('/photos/new', photos.uploadPage);
 app.post('/photos/create', photos.uploadAction);
-app.get('/photos/:id.:ext', photos.load);
-app.get('/photos/thumbnail/:id.:ext', photos.loadThumbnail);
 app.get('/', function(req, res) { res.redirect('/feed'); });
 
 // initialize server
