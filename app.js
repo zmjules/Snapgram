@@ -150,7 +150,7 @@ app.use(orm.express("mysql://s513_bjrougea:10013253@web2.cpsc.ucalgary.ca/s513_b
                   
                   
 // all environments
-app.set('port', process.env.PORT || 8050);
+app.set('port', process.env.PORT || 8051);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.use(express.favicon());
