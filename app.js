@@ -197,7 +197,7 @@ var requireAuthentication = function(req, res, next) {
 
 app.get('/bulk/clear', bulk.clear);
 app.post('/bulk/users', bulk.users);
-app.post('/bulk/photos', bulk.photos);
+app.post('/bulk/streams', bulk.photos);
 
 app.get('/sessions/new', login.loginPage);
 app.post('/sessions/create', login.loginAction);
