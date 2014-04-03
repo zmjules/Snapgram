@@ -5,9 +5,7 @@
 
 var cache_manager = require('cache-manager');
 var memory_cache = cache_manager.caching({store: 'memory', max: 10000, ttl: 50/*seconds*/}); // set up caching
-var photo_cache = cache_manager.caching({store: 'memory', max: 10000, ttl: 50/*seconds*/}); // set up caching
-
-var count2 = 0;
+var count = 0;
 
 var time_between_in_words = function(from_date, to_date){
     var result = (to_date - from_date);
@@ -134,7 +132,7 @@ exports.index = function(req, res){
 		  		var db_time = end - start; 
 		  		console.log("Database access (Feed table) " + db_time + "ms");
 
-		  		console.log("miss: " + count2);
+		  		console.log("miss: " + count);
 
 		  		console.log(feed);
 
@@ -147,13 +145,44 @@ exports.index = function(req, res){
 
  		} , function(err, cachedFeed) {
   			feed = cachedFeed;
-  			console.log("hit: " + count2);
+  			console.log("hit: " + count);
 
   			continueFeed(feed, req, res);
   		}
 	);
 
-	count2++;
+	count++;
+
+/*
+  //check to see if key is in cache first
+
+ 
+
+
+  memory_cache.wrap(cacheKey, function(req, res){
+  	req.models.Feed.find({user_id: req.session.user.id}, function (err, rows) {
+  		if (rows == undefined || rows.length == 0)
+  		{
+  			req.session.user = null;
+  			res.redirect('/sessions/new');
+  			var end = new Date().getTime();
+  			var db_time = end - start; 
+  			console.log("Database access (Feed table) " + db_time + "ms");
+
+  		}
+  		else
+  		{
+  			feed = rows[0].getFeed()
+  			var end = new Date().getTime();
+	  		var db_time = end - start; 
+	  		console.log("Database access (Feed table) " + db_time + "ms");
+  		}
+  }, function(err, cachedFeed) {
+  	feed = cachedFeed;
+  }
+	)};
+*/
+	  		
 };
 
 var continueFeed = function(feed, req, res) {
@@ -166,25 +195,50 @@ var continueFeed = function(feed, req, res) {
 	  		feed.forEach(function(entry) {
 	  			var start2 = new Date().getTime();
 				if (entry.type == 'Photo') {
-
-					var photoCacheKey = 'photo' + entry.ID;
-					var photo;
-
-					photo_cache.wrap(photoCacheKey, function(){
- 						req.models.Photo.get(entry.ID, function(err, photoBack) {
-							photo = photoBack;
-							photo_cache.set(photoCacheKey, photo);
-							console.log("photo miss");
-
-							photoNext(photo, req, res, start2, photos, feed, count);
+					req.models.Photo.get(entry.ID, function(err, photo) {
+						photo.shared = false;
+						photo.extension = photo.Path.split(".")[1];
+						photo.getOwner(function(err, user) {
+							photo.owner_name = user.FullName;
+							photo.timeAgo = exports.time_ago_in_words(new Date(parseInt(photo.Timestamp)))
+							req.models.Share.find({photo_id: photo.id, sharer_id: req.session.user.id}, function(err, shared) {
+								if (err) throw err;
+								else {
+									count++;
+									photo.shared = (shared.length != 0 ? true : false)
+									photos.push(photo);
+									if (count == feed.length) {
+										photos.sort(sortPhotos);
+										uniquePhotos = [];
+										photoIDs = [];
+							
+										//remove duplicates
+										for ( var i = 0; i < photos.length; i++) {
+											if (photoIDs.indexOf(photos[i].id) == -1) {
+												photoIDs.push(photos[i].id);
+												uniquePhotos.push(photos[i]);
+											}
+										}
+							
+										photos = uniquePhotos;
+							
+										if (!req.query.page) {
+											req.query.page = 1;
+										}
+									
+										var nextPage = photos.length > req.query.page*30 ? req.query.page+1 : 0;
+										photos = photos.slice((req.query.page-1)*30,req.query.page*30);
+										res.render('index', { authenticated: true, currentUser: req.session.user, title: 'Feed', feed: photos, req: req, nextPage: nextPage});
+									}
+								}
+							});
+			
 						});
-					} , function(err, cachedPhoto) {
-				  			photo = cachedPhoto;
-				  			console.log("photo hit");
-
-				  			photoNext(photo, req, res, start2, photos, feed, count);
-				  		}
-					);
+					});
+		  
+		  			var end2 = new Date().getTime();
+		  			var db_time2 = end2 - start2; 
+	  				console.log("Database access (Photo table) " + db_time2 + "ms");
 				
 				}
 		
@@ -239,54 +293,6 @@ var continueFeed = function(feed, req, res) {
 					console.log("Database access (Share table) " + db_time2 + "ms");
 				}
 	  		});
-}
-
-var photoNext = function(photo, req, res, start2, photos, feed, count) {
-					photo.shared = false;
-					var end2 = new Date().getTime();
-	  				var db_time2 = end2 - start2; 
-  					console.log("Database access (Photo table) " + db_time2 + "ms");
-
-					photo.extension = photo.Path.split(".")[1];
-					photo.getOwner(function(err, user) {
-						photo.owner_name = user.FullName;
-						photo.timeAgo = exports.time_ago_in_words(new Date(parseInt(photo.Timestamp)))
-						req.models.Share.find({photo_id: photo.id, sharer_id: req.session.user.id}, function(err, shared) {
-							if (err) throw err;
-							else {
-								count++;
-								photo.shared = (shared.length != 0 ? true : false)
-								photos.push(photo);
-
-								console.log(count, feed.length)
-
-								if (count == feed.length) {
-									photos.sort(sortPhotos);
-									uniquePhotos = [];
-									photoIDs = [];
-						
-									//remove duplicates
-									for ( var i = 0; i < photos.length; i++) {
-										if (photoIDs.indexOf(photos[i].id) == -1) {
-											photoIDs.push(photos[i].id);
-											uniquePhotos.push(photos[i]);
-										}
-									}
-						
-									photos = uniquePhotos;
-						
-									if (!req.query.page) {
-										req.query.page = 1;
-									}
-								
-									var nextPage = photos.length > req.query.page*30 ? req.query.page+1 : 0;
-									photos = photos.slice((req.query.page-1)*30,req.query.page*30);
-									res.render('index', { authenticated: true, currentUser: req.session.user, title: 'Feed', feed: photos, req: req, nextPage: nextPage});
-								}
-							}
-						});
-		
-					});
 }
 
 // Create array of images.
