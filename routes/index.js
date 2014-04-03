@@ -3,6 +3,10 @@
  * GET home page.
  */
 
+var cache_manager = require('cache-manager');
+var memory_cache = cache_manager.caching({store: 'memory', max: 10000, ttl: 50/*seconds*/}); // set up caching
+var count = 0;
+
 var time_between_in_words = function(from_date, to_date){
     var result = (to_date - from_date);
     if (result < 0)
@@ -112,7 +116,9 @@ exports.index = function(req, res){
   	var cacheKey = 'feed' + userID;
  	var feed;
 
- 	req.models.Feed.find({user_id: req.session.user.id}, function (err, rows) {
+
+ 	memory_cache.wrap(cacheKey, function(){
+ 		req.models.Feed.find({user_id: req.session.user.id}, function (err, rows) {
 			if (rows == undefined || rows.length == 0) {
 				req.session.user = null;
 			  	res.redirect('/sessions/new');
@@ -121,30 +127,31 @@ exports.index = function(req, res){
 			  	console.log("Database access (Feed table) " + db_time + "ms");
 		  	}
 		  	else {
-		  		console.log('here');
 		  		feed = rows[0].getFeed()
 		  		var end = new Date().getTime();
 		  		var db_time = end - start; 
 		  		console.log("Database access (Feed table) " + db_time + "ms");
 
-		  		continueFeed(feed, req,res);
+		  		console.log("miss: " + count);
+
+		  		console.log(feed);
+
+		  		memory_cache.set(cacheKey, feed);
+
+		  		continueFeed(feed, req, res);
 	        }
     	});
-
-/*
- 	memory_cache.wrap(cacheKey, function(req, res){
-
  		
 
  		} , function(err, cachedFeed) {
   			feed = cachedFeed;
+  			console.log("hit: " + count);
+
+  			continueFeed(feed, req, res);
   		}
 	);
 
-
-  //check to see if key is in cache first
-
-  	*/
+	count++;
 
 /*
   //check to see if key is in cache first
@@ -179,7 +186,7 @@ exports.index = function(req, res){
 };
 
 var continueFeed = function(feed, req, res) {
-var photos = []
+			var photos = []
 	  		var count = 0;	//Use count to call render after all photos have been added (since it's asynchronous)
   			if (feed == undefined || feed.length == 0) {
 				res.render('index', { authenticated: true, title: 'Feed', currentUser: req.session.user, feed: photos, req: req});
