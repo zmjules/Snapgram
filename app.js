@@ -13,7 +13,7 @@ var http = require('http');
 var path = require('path');
 var flash = require('connect-flash');
 var cache_manager = require('cache-manager');
-var memory_cache = cache_manager.caching({store: 'memory', max: 100, ttl: 10/*seconds*/});
+var memory_cache = cache_manager.caching({store: 'memory', max: 100, ttl: 10/*seconds*/}); // set up caching
 
 var app = express();
 app.use(express.bodyParser({keepExtensions: true, uploadDir: './photos'}));

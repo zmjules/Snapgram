@@ -106,138 +106,161 @@ var sortPhotos = function(a, b) {
 }
 
 exports.index = function(req, res){
-  var start = new Date().getTime();
-  req.models.Feed.find({user_id: req.session.user.id}, function (err, rows) {
-	  if (rows == undefined || rows.length == 0)
-	  {
-		  req.session.user = null;
-		  res.redirect('/sessions/new');
-		  var end = new Date().getTime();
-		  var db_time = end - start; 
-		  console.log("Database access (Feed table) " + db_time + "ms");
+  	var start = new Date().getTime();
 
-	  }
-	  else
-	  {
-	  var feed = rows[0].getFeed()
-	  var end = new Date().getTime();
-	  var db_time = end - start; 
-	  console.log("Database access (Feed table) " + db_time + "ms");
-	  var photos = []
-	  var count = 0;	//Use count to call render after all photos have been added (since it's asynchronous)
-	  if (feed == undefined || feed.length == 0)
-	  {
-		res.render('index', { authenticated: true, title: 'Feed', currentUser: req.session.user, feed: photos, req: req});
-	  }
-	  feed.forEach(function(entry) {
-	  	var start2 = new Date().getTime();
-		if (entry.type == 'Photo')
-		{
-		req.models.Photo.get(entry.ID, function(err, photo)
-		{
-			photo.shared = false;
-			photo.extension = photo.Path.split(".")[1];
-			photo.getOwner(function(err, user) {
-				photo.owner_name = user.FullName;
-				photo.timeAgo = exports.time_ago_in_words(new Date(parseInt(photo.Timestamp)))
-				req.models.Share.find({photo_id: photo.id, sharer_id: req.session.user.id}, function(err, shared)
-				{
-					if (err) throw err;
-					else
-					{
-						count++;
-						photo.shared = (shared.length != 0 ? true : false)
-						photos.push(photo);
-						if (count == feed.length)
-						{
-							photos.sort(sortPhotos);
-							uniquePhotos = [];
-							photoIDs = [];
-							//remove duplicates
-							for ( var i = 0; i < photos.length; i++)
-							{
-								if (photoIDs.indexOf(photos[i].id) == -1)
-								{
-									photoIDs.push(photos[i].id);
-									uniquePhotos.push(photos[i]);
-								}
-							}
-							photos = uniquePhotos;
-							if (!req.query.page)
-							{
-								req.query.page = 1;
-							}
-							var nextPage = photos.length > req.query.page*30 ? req.query.page+1 : 0;
-							photos = photos.slice((req.query.page-1)*30,req.query.page*30);
-							res.render('index', { authenticated: true, currentUser: req.session.user, title: 'Feed', feed: photos, req: req, nextPage: nextPage});
-						}
-					}
-			});
-			
-		});
-		});
-		  var end2 = new Date().getTime();
-		  var db_time2 = end2 - start2; 
-		  console.log("Database access (Photo table) " + db_time2 + "ms");
-		}
-		else
-		{
-		var start2 = new Date().getTime();
-		req.models.Share.get(entry.ID, function(err, share)
-		{
-			share.getPhoto( function(err, photo) {
-				photo.Timestamp = share.Timestamp;
-				photo.extension = photo.Path.split(".")[1];
-				photo.getOwner(function(err, user) {
-					photo.owner_name = user.FullName;
-					photo.timeAgo = exports.time_ago_in_words(new Date(parseInt(photo.Timestamp)))
-					photo.sharer_id = share.sharer_id;
-					share.getSharer(function( err, sharer) {
-						if (err) throw err;
-						photo.sharer_name = sharer.FullName;
-						req.models.Share.find({photo_id: photo.id, sharer_id: req.session.user.id}, function(err, shared)
-						{
-							if (err) throw err;
-							photo.shared = (shared.length != 0 ? true : false)
-							count++;
-							photos.push(photo);
-							if (count == feed.length)
-							{
-								photos.sort(sortPhotos);
-								uniquePhotos = [];
-								photoIDs = [];
-								//remove duplicates
-								for ( var i = 0; i < photos.length; i++)
-								{
-									if (photoIDs.indexOf(photos[i].id) == -1)
-									{
-										photoIDs.push(photos[i].id);
-										uniquePhotos.push(photos[i]);
+/*
+  //check to see if key is in cache first
+
+  var userID = req.session.user.id;
+  var cacheKey = 'feed' + userID;
+  var feed;
+
+
+  memory_cache.wrap(cacheKey, function(req, res){
+  	req.models.Feed.find({user_id: req.session.user.id}, function (err, rows) {
+  		if (rows == undefined || rows.length == 0)
+  		{
+  			req.session.user = null;
+  			res.redirect('/sessions/new');
+  			var end = new Date().getTime();
+  			var db_time = end - start; 
+  			console.log("Database access (Feed table) " + db_time + "ms");
+
+  		}
+  		else
+  		{
+  			feed = rows[0].getFeed()
+  			var end = new Date().getTime();
+	  		var db_time = end - start; 
+	  		console.log("Database access (Feed table) " + db_time + "ms");
+  		}
+  }, function(err, cachedFeed) {
+  	feed = cachedFeed;
+  }
+	)};
+*/
+	req.models.Feed.find({user_id: req.session.user.id}, function (err, rows) {
+		if (rows == undefined || rows.length == 0) {
+			req.session.user = null;
+		  	res.redirect('/sessions/new');
+		  	var end = new Date().getTime();
+		  	var db_time = end - start; 
+		  	console.log("Database access (Feed table) " + db_time + "ms");
+	  	}
+	  	else {
+	  		var feed = rows[0].getFeed()
+	  		var end = new Date().getTime();
+	  		var db_time = end - start; 
+	  		console.log("Database access (Feed table) " + db_time + "ms");
+	  		var photos = []
+	  		var count = 0;	//Use count to call render after all photos have been added (since it's asynchronous)
+  			if (feed == undefined || feed.length == 0) {
+				res.render('index', { authenticated: true, title: 'Feed', currentUser: req.session.user, feed: photos, req: req});
+	  		}
+	  		
+	  		feed.forEach(function(entry) {
+	  			var start2 = new Date().getTime();
+				if (entry.type == 'Photo') {
+					req.models.Photo.get(entry.ID, function(err, photo) {
+						photo.shared = false;
+						photo.extension = photo.Path.split(".")[1];
+						photo.getOwner(function(err, user) {
+							photo.owner_name = user.FullName;
+							photo.timeAgo = exports.time_ago_in_words(new Date(parseInt(photo.Timestamp)))
+							req.models.Share.find({photo_id: photo.id, sharer_id: req.session.user.id}, function(err, shared) {
+								if (err) throw err;
+								else {
+									count++;
+									photo.shared = (shared.length != 0 ? true : false)
+									photos.push(photo);
+									if (count == feed.length) {
+										photos.sort(sortPhotos);
+										uniquePhotos = [];
+										photoIDs = [];
+							
+										//remove duplicates
+										for ( var i = 0; i < photos.length; i++) {
+											if (photoIDs.indexOf(photos[i].id) == -1) {
+												photoIDs.push(photos[i].id);
+												uniquePhotos.push(photos[i]);
+											}
+										}
+							
+										photos = uniquePhotos;
+							
+										if (!req.query.page) {
+											req.query.page = 1;
+										}
+									
+										var nextPage = photos.length > req.query.page*30 ? req.query.page+1 : 0;
+										photos = photos.slice((req.query.page-1)*30,req.query.page*30);
+										res.render('index', { authenticated: true, currentUser: req.session.user, title: 'Feed', feed: photos, req: req, nextPage: nextPage});
 									}
 								}
-								photos = uniquePhotos;
-								if (!req.query.page)
-								{
-									req.query.page = 1;
-								}
-								var nextPage = photos.length > req.query.page*30 ? req.query.page+1 : 0;
-								photos = photos.slice((req.query.page-1)*30,req.query.page*30);
-								res.render('index', { authenticated: true, title: 'Feed', currentUser: req.session.user, feed: photos, req: req, nextPage: nextPage});
-							}
+							});
+			
 						});
 					});
-				});
-			});
-			
-		});
-		var end2 = new Date().getTime();
-		var db_time2 = end2 - start2; 
-		console.log("Database access (Share table) " + db_time2 + "ms");
-		}
-	  });
-        }
-        });
+		  
+		  			var end2 = new Date().getTime();
+		  			var db_time2 = end2 - start2; 
+	  				console.log("Database access (Photo table) " + db_time2 + "ms");
+				
+				}
+		
+				else {
+					var start2 = new Date().getTime();
+					req.models.Share.get(entry.ID, function(err, share) {
+						share.getPhoto( function(err, photo) {
+							photo.Timestamp = share.Timestamp;
+							photo.extension = photo.Path.split(".")[1];
+							photo.getOwner(function(err, user) {
+								photo.owner_name = user.FullName;
+								photo.timeAgo = exports.time_ago_in_words(new Date(parseInt(photo.Timestamp)))
+								photo.sharer_id = share.sharer_id;
+								share.getSharer(function( err, sharer) {
+									if (err) throw err;
+									photo.sharer_name = sharer.FullName;
+									req.models.Share.find({photo_id: photo.id, sharer_id: req.session.user.id}, function(err, shared) {
+										if (err) throw err;
+										photo.shared = (shared.length != 0 ? true : false)
+										count++;
+										photos.push(photo);
+										if (count == feed.length) {
+											photos.sort(sortPhotos);
+											uniquePhotos = [];
+											photoIDs = [];
+											//remove duplicates
+											for ( var i = 0; i < photos.length; i++) {
+												if (photoIDs.indexOf(photos[i].id) == -1) {
+													photoIDs.push(photos[i].id);
+													uniquePhotos.push(photos[i]);
+												}
+											}
+								
+											photos = uniquePhotos;
+											if (!req.query.page) {
+												req.query.page = 1;
+											}
 
+											var nextPage = photos.length > req.query.page*30 ? req.query.page+1 : 0;
+											photos = photos.slice((req.query.page-1)*30,req.query.page*30);
+											res.render('index', { authenticated: true, title: 'Feed', currentUser: req.session.user, feed: photos, req: req, nextPage: nextPage});
+										}
+									});
+								});
+							});
+						});
+			
+					});
+		
+					var end2 = new Date().getTime();
+					var db_time2 = end2 - start2; 
+					console.log("Database access (Share table) " + db_time2 + "ms");
+				}
+	  		});
+        }
+    });
 };
 
 // Create array of images.
