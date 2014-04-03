@@ -253,7 +253,6 @@ var continueFeed = function(feed, req, res) {
 				
 						else {
 							var start2 = new Date().getTime();
-							console.log("SHARE");
 							req.models.Share.get(entry.ID, function(err, share) {
 								share.getPhoto( function(err, photo) {
 									photo.Timestamp = share.Timestamp;

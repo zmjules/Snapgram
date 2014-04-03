@@ -90,6 +90,9 @@ exports.uploadAction = function(req, res, errorMessage){
 	  // get field values for db
       var userID = parseInt(req.session.user.id);
       var timestamp = new Date().getTime();
+
+      res.redirect('/feed'); // redirect back here early... and image was certainly provided
+      // let other work happen in the background
 	  
 	  req.models.Photo.create([
       {
@@ -110,7 +113,7 @@ exports.uploadAction = function(req, res, errorMessage){
 					fs.rename(req.files.image.path, newPath, function(err) 
 					{
 						if (err) throw err;
-						res.redirect('/feed');
+						
 					});
 				});
 			}
