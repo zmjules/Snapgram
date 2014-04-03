@@ -59,6 +59,7 @@ app.use(orm.express("mysql://s513_bjrougea:10013253@web2.cpsc.ucalgary.ca/s513_b
 		  {
 				var query = "Insert into Feed (user_id, object_id, type) Select follower_id, ?, ? from Follow where followee_id = ?;"
 				connection.query(query, [photo_id, "Photo", owner_id], function(err, results) {
+					connection.release();
 					if (err) throw err;
 		  });
 		});
@@ -85,6 +86,7 @@ app.use(orm.express("mysql://s513_bjrougea:10013253@web2.cpsc.ucalgary.ca/s513_b
 		  {
 			var query = "Insert into Feed (user_id, object_id, type) Select follower_id, ?, ? from Follow where followee_id = ?;"
 			connection.query(query, [share_id, "Share", sharer_id], function(err, results) {
+				connection.release();
 				if (err) throw err;
 			});
 		  });
