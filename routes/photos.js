@@ -39,7 +39,7 @@ exports.loadThumbnail = function(req, res){
 	})
 	var start = new Date().getTime();
 	req.models.Photo.get(req.params.id, function(err, photo) {
-		if (err) throw err;
+		if (err) console.log("issue loading thumbnail");
 		var newPathSplit = photo.Path.split(".");
 		var newPath = newPathSplit[0] + "thumb." + newPathSplit[1];
 
