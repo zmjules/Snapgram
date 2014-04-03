@@ -68,6 +68,8 @@ app.use(orm.express("mysql://s513_bjrougea:10013253@web2.cpsc.ucalgary.ca/s513_b
 				var query = "Select Feed.user_id, Feed.FeedList from Feed, Follow where Follow.followee_id = ? and Feed.user_id = Follow.follower_id;"
 				connection.query(query, [owner_id], function(err, results) {
 					saveData = {}
+					var feedsUpdated = 0;
+					var resultLength = results.length;
 					results.forEach( function(result) {
 						currentList = JSON.parse(result.FeedList)
 						currentList.push({'ID': photo_id, 'type': 'Photo'});
@@ -75,10 +77,14 @@ app.use(orm.express("mysql://s513_bjrougea:10013253@web2.cpsc.ucalgary.ca/s513_b
 						var update = "Update Feed SET FeedList = ? WHERE user_id = ?;"
 						connection.query(update, [currentList,result.user_id], function(err, result) {
 							connection.release();
-							app.lock.shift();
-							if ( app.lock.length )
+							feedsUpdated++
+							if (feedsUpdated == resultLength)
 							{
-								app.lock[0]();
+								app.lock.shift();
+								if ( app.lock.length )
+								{
+									app.lock[0]();
+								}
 							}
 						});
 					});
