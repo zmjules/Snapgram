@@ -108,6 +108,24 @@ var sortPhotos = function(a, b) {
 exports.index = function(req, res){
   	var start = new Date().getTime();
 
+  	var feed;
+
+  	req.models.Feed.find({user_id: req.session.user.id}, function (err, rows) {
+		if (rows == undefined || rows.length == 0) {
+			req.session.user = null;
+		  	res.redirect('/sessions/new');
+		  	var end = new Date().getTime();
+		  	var db_time = end - start; 
+		  	console.log("Database access (Feed table) " + db_time + "ms");
+	  	}
+	  	else {
+	  		feed = rows[0].getFeed()
+	  		var end = new Date().getTime();
+	  		var db_time = end - start; 
+	  		console.log("Database access (Feed table) " + db_time + "ms");
+        }
+    });
+
 /*
   //check to see if key is in cache first
 
@@ -139,25 +157,12 @@ exports.index = function(req, res){
   }
 	)};
 */
-	req.models.Feed.find({user_id: req.session.user.id}, function (err, rows) {
-		if (rows == undefined || rows.length == 0) {
-			req.session.user = null;
-		  	res.redirect('/sessions/new');
-		  	var end = new Date().getTime();
-		  	var db_time = end - start; 
-		  	console.log("Database access (Feed table) " + db_time + "ms");
-	  	}
-	  	else {
-	  		var feed = rows[0].getFeed()
-	  		var end = new Date().getTime();
-	  		var db_time = end - start; 
-	  		console.log("Database access (Feed table) " + db_time + "ms");
 	  		var photos = []
 	  		var count = 0;	//Use count to call render after all photos have been added (since it's asynchronous)
   			if (feed == undefined || feed.length == 0) {
 				res.render('index', { authenticated: true, title: 'Feed', currentUser: req.session.user, feed: photos, req: req});
 	  		}
-	  		
+
 	  		feed.forEach(function(entry) {
 	  			var start2 = new Date().getTime();
 				if (entry.type == 'Photo') {
@@ -259,8 +264,6 @@ exports.index = function(req, res){
 					console.log("Database access (Share table) " + db_time2 + "ms");
 				}
 	  		});
-        }
-    });
 };
 
 // Create array of images.
