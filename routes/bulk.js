@@ -161,7 +161,7 @@ exports.photos = function(req, res){
 		{
 			req.models.Photo.create([
 			{
-				id: photos[i].id,
+				id: photos[i].id+1,
 				owner_id: photos[i].user_id,
 				Path: photos[i].path,
 				Timestamp: photos[i].timestamp
@@ -171,7 +171,7 @@ exports.photos = function(req, res){
 				var newPath = path.normalize(__dirname + "/../photos/" + items[0].id + "." + extension)
 				var thumbPath = path.normalize(__dirname + "/../photos/thumbnail/" + items[0].id + "." + extension)
 				fs.createReadStream(items[0].Path).pipe(fs.createWriteStream(newPath));
-				gm(newPath).resize(400).write(thumbPath, function(err) {
+				gm(items[0].Path).resize(400).write(thumbPath, function(err) {
 					loadedPhotos++
 					if (err) throw err;
 					if (loadedPhotos == photos.length)
