@@ -13,6 +13,15 @@ var http = require('http');
 var path = require('path');
 var flash = require('connect-flash');
 
+mysql = require('mysql');
+pool = mysql.createPool({
+		host: 'web2.cpsc.ucalgary.ca',
+		user: 's513_bjrougea',
+		password: '10013253',
+		database: 's513_bjrougea',
+		connectionLimit: 5
+		});
+
 var app = express();
 app.use(express.bodyParser({keepExtensions: true, uploadDir: './photos'}));
 app.lock = []
@@ -51,41 +60,12 @@ app.use(orm.express("mysql://s513_bjrougea:10013253@web2.cpsc.ucalgary.ca/s513_b
     }, {
       hooks: {
         afterCreate: function (next){
-		  mysql = require('mysql');
-		  connection = mysql.createConnection({
-										host: 'web2.cpsc.ucalgary.ca',
-										user: 's513_bjrougea',
-										password: '10013253',
-										database: 's513_bjrougea'                              });
-
-		  connection.connect();
-		  var query = "Select Feed.user_id, Feed.FeedList from Feed, Follow where Follow.followee_id = ? and Feed.user_id = Follow.follower_id;"
-		  var photo_id = this.id;
-		  if (app.lock.length == 0)
+		  pool.getConnection(function(err, connection)
 		  {
-			connection.query(query, [this.owner_id], function(err, results) {
-				saveData = {}
-				results.forEach( function(result) {
-					currentList = JSON.parse(result.FeedList)
-					currentList.push({'ID': photo_id, 'type': 'Photo'});
-					currentList = JSON.stringify(currentList);
-					var update = "Update Feed SET FeedList = ? WHERE user_id = ?;"
-					connection.query(update, [currentList,result.user_id], function(err, result) {
-						if (app.lock != undefined)
-						{
-							app.lock.shift();
-							if ( app.lock.length )
-							{
-								app.lock[0]();
-							}
-						}
-					});
-				});
-			});
-		  }
-		  else
-		  {
-			app.lock.push(function() {
+			  var query = "Select Feed.user_id, Feed.FeedList from Feed, Follow where Follow.followee_id = ? and Feed.user_id = Follow.follower_id;"
+			  var photo_id = this.id;
+			  if (app.lock.length == 0)
+			  {
 				connection.query(query, [this.owner_id], function(err, results) {
 					saveData = {}
 					results.forEach( function(result) {
@@ -96,6 +76,7 @@ app.use(orm.express("mysql://s513_bjrougea:10013253@web2.cpsc.ucalgary.ca/s513_b
 						connection.query(update, [currentList,result.user_id], function(err, result) {
 							if (app.lock != undefined)
 							{
+								connection.end();
 								app.lock.shift();
 								if ( app.lock.length )
 								{
@@ -105,10 +86,35 @@ app.use(orm.express("mysql://s513_bjrougea:10013253@web2.cpsc.ucalgary.ca/s513_b
 						});
 					});
 				});
+			  }
+			  else
+			  {
+				app.lock.push(function() {
+					connection.query(query, [this.owner_id], function(err, results) {
+						saveData = {}
+						results.forEach( function(result) {
+							currentList = JSON.parse(result.FeedList)
+							currentList.push({'ID': photo_id, 'type': 'Photo'});
+							currentList = JSON.stringify(currentList);
+							var update = "Update Feed SET FeedList = ? WHERE user_id = ?;"
+							connection.query(update, [currentList,result.user_id], function(err, result) {
+								if (app.lock != undefined)
+								{
+									connection.end();
+									app.lock.shift();
+									if ( app.lock.length )
+									{
+										app.lock[0]();
+									}
+								}
+							});
+						});
+					});
+				});
+			  }
 			});
-		  }
-        }
-      }
+		}
+	  }
   });
 
     models.Follow = db.define("Follow", {
