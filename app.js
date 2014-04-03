@@ -15,10 +15,11 @@ var flash = require('connect-flash');
 
 var app = express();
 app.use(express.bodyParser({keepExtensions: true, uploadDir: './photos'}));
-app.lock = {}
+app.lock = []
 
 app.use(orm.express("mysql://s513_bjrougea:10013253@web2.cpsc.ucalgary.ca/s513_bjrougea", {
   define: function (db, models, next) {
+	db.settings.set('instance.cache', false);
     models.User = db.define("User", { 
         FullName : String,
         Username : String,
@@ -50,38 +51,64 @@ app.use(orm.express("mysql://s513_bjrougea:10013253@web2.cpsc.ucalgary.ca/s513_b
     }, {
       hooks: {
         afterCreate: function (next){
+		  mysql = require('mysql');
+		  connection = mysql.createConnection({
+										host: 'web2.cpsc.ucalgary.ca',
+										user: 's513_bjrougea',
+										password: '10013253',
+										database: 's513_bjrougea'                              });
+
+		  connection.connect();
+		  var query = "Select Feed.user_id, Feed.FeedList from Feed, Follow where Follow.followee_id = ? and Feed.user_id = Follow.follower_id;"
 		  var photo_id = this.id;
-          models.Follow.find({followee_id: this.owner_id}, function(err, rows) {
-			if (err) throw err;
-            rows.forEach(function(row){
-              // add photos to all follower's feeds
-              row.getFollower(function (err, follower){
-				if (err) throw err;
-				//Need to queue up function to load and update feed, as otherwise each feed update will overwrite itself in bulk uploading
-				if (app.lock[follower.id] == undefined || app.lock[follower.id].length == 0)
-				{
-					app.lock[follower.id] = [ function() {
-						follower.getFeed(function (err, feed){
-							if (err) throw err;
-							feed[0].addToFeed(photo_id, "Photo");
-						});
-					} ];
-					app.lock[follower.id][0]();
-				}
-				else
-				{
-					app.lock[follower.id].push(function() {
-						follower.getFeed(function (err, feed){
-							if (err) throw err;
+		  if (app.lock.length == 0)
+		  {
+			connection.query(query, [this.owner_id], function(err, results) {
+				saveData = {}
+				results.forEach( function(result) {
+					currentList = JSON.parse(result.FeedList)
+					currentList.push({'ID': photo_id, 'type': 'Photo'});
+					currentList = JSON.stringify(currentList);
+					var update = "Update Feed SET FeedList = ? WHERE user_id = ?;"
+					connection.query(update, [currentList,result.user_id], function(err, result) {
+						if (app.lock != undefined)
+						{
+							app.lock.shift();
+							if ( app.lock.length )
+							{
+								app.lock[0]();
+							}
+						}
+					});
+				});
+			});
+		  }
+		  else
+		  {
+			app.lock.push(function() {
+				connection.query(query, [this.owner_id], function(err, results) {
+					saveData = {}
+					results.forEach( function(result) {
+						currentList = JSON.parse(result.FeedList)
+						currentList.push({'ID': photo_id, 'type': 'Photo'});
+						currentList = JSON.stringify(currentList);
+						var update = "Update Feed SET FeedList = ? WHERE user_id = ?;"
+						connection.query(update, [currentList,result.user_id], function(err, result) {
+							if (app.lock != undefined)
+							{
+								app.lock.shift();
+								if ( app.lock.length )
+								{
+									app.lock[0]();
+								}
+							}
 						});
 					});
-				}
-                
-				})
-            })
-        });
+				});
+			});
+		  }
+        }
       }
-    }
   });
 
     models.Follow = db.define("Follow", {
