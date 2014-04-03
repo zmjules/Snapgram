@@ -13,11 +13,14 @@ var http = require('http');
 var path = require('path');
 var flash = require('connect-flash');
 
+var cache_manager = require('cache-manager');
+var memory_cache = cache_manager.caching({store: 'memory', max: 100, ttl: 100/*seconds*/}
+
 var app = express();
 app.use(express.bodyParser({keepExtensions: true, uploadDir: './photos'}));
 app.lock = {}
 
-app.use(orm.express("mysql://s513_krdillma:10083537@web2.cpsc.ucalgary.ca/s513_krdillma", {
+app.use(orm.express("mysql://s513_krdillma:10083537@localhost/s513_krdillma", {
   define: function (db, models, next) {
     models.User = db.define("User", { 
         FullName : String,
