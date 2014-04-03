@@ -108,7 +108,7 @@ var sortPhotos = function(a, b) {
 exports.index = function(req, res){
   var start = new Date().getTime();
   req.models.Feed.find({user_id: req.session.user.id}, function (err, rows) {
-	  if (rows == undefined || rows.length == 0)
+	  if (rows == undefined)
 	  {
 		  req.session.user = null;
 		  res.redirect('/sessions/new');
@@ -119,21 +119,22 @@ exports.index = function(req, res){
 	  }
 	  else
 	  {
-	  var feed = rows[0].getFeed()
+	  var feed = rows
 	  var end = new Date().getTime();
 	  var db_time = end - start; 
 	  console.log("Database access (Feed table) " + db_time + "ms");
 	  var photos = []
 	  var count = 0;	//Use count to call render after all photos have been added (since it's asynchronous)
-	  if (feed == undefined || feed.length == 0)
+	  if (feed.length == 0)
 	  {
 		res.render('index', { authenticated: true, title: 'Feed', currentUser: req.session.user, feed: photos, req: req});
 	  }
 	  feed.forEach(function(entry) {
 	  	var start2 = new Date().getTime();
+		console.log(entry.object_id);
 		if (entry.type == 'Photo')
 		{
-		req.models.Photo.get(entry.ID, function(err, photo)
+		req.models.Photo.get(entry.object_id, function(err, photo)
 		{
 			photo.shared = false;
 			photo.extension = photo.Path.split(".")[1];
@@ -183,7 +184,7 @@ exports.index = function(req, res){
 		else
 		{
 		var start2 = new Date().getTime();
-		req.models.Share.get(entry.ID, function(err, share)
+		req.models.Share.get(entry.object_id, function(err, share)
 		{
 			share.getPhoto( function(err, photo) {
 				photo.Timestamp = share.Timestamp;

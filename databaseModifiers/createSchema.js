@@ -27,7 +27,8 @@ followTable = "CREATE TABLE Follow (\
 feedTable = "CREATE TABLE Feed (\
 				`ID` INT NOT NULL AUTO_INCREMENT,\
                 `user_id` INT,\
-                `FeedList` VARCHAR(10000),\
+				`object_id` INT,\
+                `type` VARCHAR(20),\
                 PRIMARY KEY (ID)\
             );"
 			

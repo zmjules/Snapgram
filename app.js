@@ -43,13 +43,6 @@ app.use(orm.express("mysql://s513_bjrougea:10013253@web2.cpsc.ucalgary.ca/s513_b
             }], function (err, items) {
               if (err) throw err;
             })
-		   models.Feed.create([
-			{
-				user_id: this.id,
-				FeedList: '[]'
-			}], function (err, newFeed) {
-				if (err) throw err;
-			})
         }
       }
     })
@@ -64,36 +57,10 @@ app.use(orm.express("mysql://s513_bjrougea:10013253@web2.cpsc.ucalgary.ca/s513_b
 		  var owner_id = this.owner_id;
 		  pool.getConnection(function(err, connection)
 		  {
-			app.lock.push(function() {
-				var query = "Select Feed.user_id, Feed.FeedList from Feed, Follow where Follow.followee_id = ? and Feed.user_id = Follow.follower_id;"
-				connection.query(query, [owner_id], function(err, results) {
-					saveData = {}
-					var feedsUpdated = 0;
-					var resultLength = results.length;
-					results.forEach( function(result) {
-						currentList = JSON.parse(result.FeedList)
-						currentList.push({'ID': photo_id, 'type': 'Photo'});
-						currentList = JSON.stringify(currentList);
-						var update = "Update Feed SET FeedList = ? WHERE user_id = ?;"
-						connection.query(update, [currentList,result.user_id], function(err, result) {
-							connection.release();
-							feedsUpdated++
-							if (feedsUpdated == resultLength)
-							{
-								app.lock.shift();
-								if ( app.lock.length )
-								{
-									app.lock[0]();
-								}
-							}
-						});
-					});
-				});
-			});
-			if (app.lock.length == 1)
-			{
-				app.lock[0]();
-			}
+				var query = "Insert into Feed (user_id, object_id, type) Select follower_id, ?, ? from Follow where followee_id = ?;"
+				connection.query(query, [photo_id, "Photo", owner_id], function(err, results) {
+					if (err) throw err;
+		  });
 		});
 		}
 	  }
@@ -103,30 +70,9 @@ app.use(orm.express("mysql://s513_bjrougea:10013253@web2.cpsc.ucalgary.ca/s513_b
         //No fields, both fields are relationships defined below
     });
     models.Feed = db.define("Feed", { 
-        FeedList: String
-    }, {
-        methods: {
-            addToFeed: function (itemID, type) {
-				currentList = JSON.parse(this.FeedList)
-				currentList.push({'ID': itemID, 'type': type});
-				this.FeedList = JSON.stringify(currentList);
-				this.save();
-            },
-            getFeed: function () {
-                return JSON.parse(this.FeedList);
-            }
-    }, hooks: {
-		afterSave: function () {
-			if (app.lock[this.user_id] != undefined)
-			{
-				app.lock[this.user_id].shift();
-				if ( app.lock[this.user_id].length )
-				{
-					app.lock[this.user_id][0]();
-				}
-			}
-		}
-	}
+        user_id: Number,
+		object_id: Number,
+		type: String
     });
 	models.Share = db.define("Share", {
         Timestamp: Date
@@ -134,28 +80,20 @@ app.use(orm.express("mysql://s513_bjrougea:10013253@web2.cpsc.ucalgary.ca/s513_b
       hooks: {
         afterCreate: function (next){
 		  var share_id = this.id;
-          models.Follow.find({followee_id: this.sharer_id}, function(err, rows) {
-			if (err) throw err;
-            rows.forEach(function(row){
-              // add photos to all follower's feeds
-              row.getFollower(function (err, follower){
+		  var sharer_id = this.sharer_id;
+          pool.getConnection(function(err, connection)
+		  {
+			var query = "Insert into Feed (user_id, object_id, type) Select follower_id, ?, ? from Follow where followee_id = ?;"
+			connection.query(query, [share_id, "Share", sharer_id], function(err, results) {
 				if (err) throw err;
-                follower.getFeed(function (err, feed){
-					if (err) throw err;
-				  	feed[0].addToFeed(share_id, "Share");
-                })
-				})
-            })
-        });
-      }
-    }
+			});
+		  });
+		}
+	}
   });
     models.Photo.hasOne("owner", models.User);
     models.Follow.hasOne("follower", models.User);
     models.Follow.hasOne("followee", models.User);
-    models.Feed.hasOne("user", models.User, {
-      reverse: "feed"
-    });
 	models.Share.hasOne("sharer", models.User);
 	models.Share.hasOne("photo", models.Photo);
     next();
