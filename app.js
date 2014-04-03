@@ -60,13 +60,13 @@ app.use(orm.express("mysql://s513_bjrougea:10013253@web2.cpsc.ucalgary.ca/s513_b
     }, {
       hooks: {
         afterCreate: function (next){
+		  var photo_id = this.id;
+		  var owner_id = this.owner_id;
 		  pool.getConnection(function(err, connection)
 		  {
-			  var query = "Select Feed.user_id, Feed.FeedList from Feed, Follow where Follow.followee_id = ? and Feed.user_id = Follow.follower_id;"
-			  var photo_id = this.id;
-			  if (app.lock.length == 0)
-			  {
-				connection.query(query, [this.owner_id], function(err, results) {
+			app.lock.push(function() {
+				var query = "Select Feed.user_id, Feed.FeedList from Feed, Follow where Follow.followee_id = ? and Feed.user_id = Follow.follower_id;"
+				connection.query(query, [owner_id], function(err, results) {
 					saveData = {}
 					results.forEach( function(result) {
 						currentList = JSON.parse(result.FeedList)
@@ -74,45 +74,21 @@ app.use(orm.express("mysql://s513_bjrougea:10013253@web2.cpsc.ucalgary.ca/s513_b
 						currentList = JSON.stringify(currentList);
 						var update = "Update Feed SET FeedList = ? WHERE user_id = ?;"
 						connection.query(update, [currentList,result.user_id], function(err, result) {
-							if (app.lock != undefined)
+							connection.release();
+							app.lock.shift();
+							if ( app.lock.length )
 							{
-								connection.end();
-								app.lock.shift();
-								if ( app.lock.length )
-								{
-									app.lock[0]();
-								}
+								app.lock[0]();
 							}
 						});
 					});
 				});
-			  }
-			  else
-			  {
-				app.lock.push(function() {
-					connection.query(query, [this.owner_id], function(err, results) {
-						saveData = {}
-						results.forEach( function(result) {
-							currentList = JSON.parse(result.FeedList)
-							currentList.push({'ID': photo_id, 'type': 'Photo'});
-							currentList = JSON.stringify(currentList);
-							var update = "Update Feed SET FeedList = ? WHERE user_id = ?;"
-							connection.query(update, [currentList,result.user_id], function(err, result) {
-								if (app.lock != undefined)
-								{
-									connection.end();
-									app.lock.shift();
-									if ( app.lock.length )
-									{
-										app.lock[0]();
-									}
-								}
-							});
-						});
-					});
-				});
-			  }
 			});
+			if (app.lock.length == 1)
+			{
+				app.lock[0]();
+			}
+		});
 		}
 	  }
   });
