@@ -51,34 +51,29 @@ exports.uploadPage = function(req, res, errorMessage){
 }
 
 exports.uploadAction = function(req, res, errorMessage){
-  // return to upload page if no image provided
-  if ( req.files.image.size == 0 ){
-  	  req.flash('NotValidErr','File Not Found');
-      res.redirect('/photos/new');
-  }
-  else {
-    var info = req.files.image.type.split("/");
-    var type = info[0];
+	// return to upload page if no image provided
+	var info = req.files.image.type.split("/");
+	var type = info[0];
 	var extension = info[1];
-	
-    // error if an image was not provided
-    if (type != 'image'){
-      req.flash('NotValidErr', 'File Not an Image');
-      res.redirect('/photos/new');
-    }
-    // valid image provided 
-    else {
+
+	// error if an image was not provided
+	if (type != 'image'){
+	  req.flash('NotValidErr', 'File Not an Valid Image');
+	  res.redirect('/photos/new');
+	}
+	// valid image provided 
+	else {
 	  var start = new Date().getTime();
 	  // get field values for db
-      var userID = parseInt(req.session.user.id);
-      var timestamp = new Date().getTime();
+	  var userID = parseInt(req.session.user.id);
+	  var timestamp = new Date().getTime();
 	  
 	  req.models.Photo.create([
-      {
-        Path: req.files.image.path,
-        owner_id: userID,
-        Timestamp: timestamp, 
-      }], function (err, items) {
+	  {
+	    Path: req.files.image.path,
+	    owner_id: userID,
+	    Timestamp: timestamp, 
+	  }], function (err, items) {
 			if (err) throw err;
 			else
 			{
@@ -97,7 +92,6 @@ exports.uploadAction = function(req, res, errorMessage){
 		var end = new Date().getTime();
 	  	var db_time = end - start; 
 	  	console.log("Database access (Photo table) " + db_time + "ms");
-		})
-    } 
-  }
+		}) 
+	}
 }
