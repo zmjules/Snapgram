@@ -106,23 +106,16 @@ var sortPhotos = function(a, b) {
 }
 
 exports.index = function(req, res){
-  var start = new Date().getTime();
   req.models.Feed.find({user_id: req.session.user.id}, function (err, rows) {
 	  if (rows == undefined || rows.length == 0)
 	  {
 		  req.session.user = null;
 		  res.redirect('/sessions/new');
-		  var end = new Date().getTime();
-		  var db_time = end - start; 
-		  console.log("Database access (Feed table) " + db_time + "ms");
 
 	  }
 	  else
 	  {
 	  var feed = rows[0].getFeed()
-	  var end = new Date().getTime();
-	  var db_time = end - start; 
-	  console.log("Database access (Feed table) " + db_time + "ms");
 	  var photos = []
 	  var count = 0;	//Use count to call render after all photos have been added (since it's asynchronous)
 	  if (feed == undefined || feed.length == 0)
@@ -238,7 +231,6 @@ exports.stream = function(req, res){
 	var id = req.params.id;
 	var user;
     var following = false;
-    var start = new Date().getTime();
 
 	req.models.User.find({ID: id}, function(err, rows) {
        if (err || rows.length != 1)
@@ -273,18 +265,11 @@ exports.stream = function(req, res){
 				//Deal with the asynchronicity (it's a word!)
 				var photoCount = 0;
 				var shareCount = 0;
-				var end = new Date().getTime();
-		   		var db_time = end - start; 
-		   		console.log("Database access (Follow table) " + db_time + "ms");
 				
-				start = new Date().getTime();
 				req.models.Photo.find({owner_id: id}, function (err, rows) {
 					if (err) throw err;
 					if (rows.length > 0)
 					{
-					end = new Date().getTime();
-					db_time = end - start; 
-					console.log("Database access (Photo table) " + db_time + "ms");
 					rows.forEach( function(photo) {
 						photo.extension = photo.Path.split(".")[1];
 						photo.getOwner(function(err, owner) {
@@ -358,9 +343,6 @@ exports.stream = function(req, res){
 							});
 							});
 							});
-					end = new Date().getTime();
-					db_time = end - start; 
-	  				console.log("Database access (Share table) " + db_time + "ms");
 					}
 					//No photos exist, but some shares might
 					else
@@ -423,9 +405,6 @@ exports.stream = function(req, res){
            });
          }
      });
-var end = new Date().getTime();
-var db_time = end - start; 
-console.log("Database access (Share table) " + db_time + "ms");
 };
 
 //Unit test function
@@ -459,7 +438,6 @@ exports.follow = function(req, res){
         return;
     }
 	
-	var start = new Date().getTime();
     //Check that the requested user to follow exists
     req.models.User.find({ID: followeeID}, function(err, rows) {
 	 if (err) throw err;
@@ -494,9 +472,6 @@ exports.follow = function(req, res){
                     })
                }
          });
-        var end = new Date().getTime()
-        var db_time = end - start; 
-	  	console.log("Database access (Follow table) " + db_time + "ms");
         }
     });
 };
@@ -508,13 +483,11 @@ var followeeID = req.params.id;
 
 if (followerID == followeeID)
 {
-    console.log("You can't unfollow yourself stupid");
     //TODO: Redirect to 404 page
     res.redirect('/feed');
     return;
 }
 
-var start = new Date().getTime();
 //Check that the follow relationship exists
 req.models.Follow.find({follower_id: followerID, followee_id: followeeID}, function(err, rows) {
         if (err || rows.length == 0)
@@ -530,9 +503,6 @@ req.models.Follow.find({follower_id: followerID, followee_id: followeeID}, funct
              });
         }
      });
-var end = new Date().getTime();
-var db_time = end - start; 
-console.log("Database access (Follow table) " + db_time + "ms");
 };
 
 exports.share = function(req, res){
@@ -541,7 +511,6 @@ var sharerID = parseInt(req.session.user.id);
 var photoID = req.params.id;
 var timestamp = new Date().getTime();
 
-var start = new Date().getTime();
 req.models.Share.create([
    {
 	   sharer_id: sharerID,
@@ -554,7 +523,4 @@ req.models.Share.create([
 			res.end();
 			}
 	})
-var end = new Date().getTime();
-var db_time = end - start; 
-console.log("Database access (Share table) " + db_time + "ms");
 };
