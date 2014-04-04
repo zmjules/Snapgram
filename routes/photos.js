@@ -54,7 +54,6 @@ exports.uploadAction = function(req, res, errorMessage){
 	}
 	// valid image provided 
 	else {
-	  var start = new Date().getTime();
 	  // get field values for db
 	  var userID = parseInt(req.session.user.id);
 	  var timestamp = new Date().getTime();
@@ -80,9 +79,6 @@ exports.uploadAction = function(req, res, errorMessage){
 					});
 				});
 			}
-		var end = new Date().getTime();
-	  	var db_time = end - start; 
-	  	console.log("Database access (Photo table) " + db_time + "ms");
 		}) 
 	}
 }
