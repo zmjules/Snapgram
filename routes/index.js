@@ -130,7 +130,6 @@ exports.index = function(req, res){
 		res.render('index', { authenticated: true, title: 'Feed', currentUser: req.session.user, feed: photos, req: req});
 	  }
 	  feed.forEach(function(entry) {
-	  	var start2 = new Date().getTime();
 		if (entry.type == 'Photo')
 		{
 		req.models.Photo.get(entry.ID, function(err, photo)
@@ -176,13 +175,9 @@ exports.index = function(req, res){
 			
 		});
 		});
-		  var end2 = new Date().getTime();
-		  var db_time2 = end2 - start2; 
-		  console.log("Database access (Photo table) " + db_time2 + "ms");
 		}
 		else
 		{
-		var start2 = new Date().getTime();
 		req.models.Share.get(entry.ID, function(err, share)
 		{
 			share.getPhoto( function(err, photo) {
@@ -230,9 +225,6 @@ exports.index = function(req, res){
 			});
 			
 		});
-		var end2 = new Date().getTime();
-		var db_time2 = end2 - start2; 
-		console.log("Database access (Share table) " + db_time2 + "ms");
 		}
 	  });
         }
