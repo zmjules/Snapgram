@@ -11,7 +11,6 @@ exports.load = function(req, res){
 	res.writeHead(200, {
             'Content-Type':('image/' + req.params.ext)
 	})
-	var start = new Date().getTime();
 	req.models.Photo.get(req.params.id, function(err, photo) {
 		var image = gm(photo.Path);
 		image.stream(function (err, stdout, stderr)
@@ -19,9 +18,6 @@ exports.load = function(req, res){
 			if (err) throw err;
 			stdout.pipe(res); 
 		});
-		var end = new Date().getTime();
-		var db_time = end - start; 
-		console.log("Database access (Photo table) " + db_time + "ms");
 	});
 }
 
@@ -29,7 +25,6 @@ exports.loadThumbnail = function(req, res){
 	res.writeHead(200, {
             'Content-Type':('image/' + req.params.ext)
 	})
-	var start = new Date().getTime();
 	req.models.Photo.get(req.params.id, function(err, photo) {
 		if (err) throw err;
 		var image = gm(photo.Path);
@@ -38,9 +33,6 @@ exports.loadThumbnail = function(req, res){
 			if (err) throw err;
 			stdout.pipe(res); 
 		});
-		var end = new Date().getTime();
-		var db_time = end - start; 
-		console.log("Database access (Photo table) " + db_time + "ms");
 	});
 }
 
