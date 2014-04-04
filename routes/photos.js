@@ -33,7 +33,6 @@ exports.loadThumbnail = function(req, res){
 	req.models.Photo.get(req.params.id, function(err, photo) {
 		if (err) throw err;
 		var image = gm(photo.Path);
-		image.resize(400);
 		image.stream(function (err, stdout, stderr)
 		{
 			if (err) throw err;
